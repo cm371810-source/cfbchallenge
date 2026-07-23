@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Big Ten–SEC Challenge Results</title>
+<style>
+:root{--bg:#f3f5f7;--card:#fff;--text:#17202a;--muted:#667085;--line:#d8dee6;--b10:#174ea6;--sec:#8b1e1e}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+.container{max-width:1050px;margin:0 auto;padding:28px 18px 48px}
+.hero{background:#111827;color:#fff;border-radius:18px;padding:26px;margin-bottom:18px}
+.hero h1{margin:0 0 8px;font-size:32px}
+.hero p{margin:0;color:#d1d5db}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;margin-top:16px}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+button,a.button{border:0;border-radius:10px;padding:12px 16px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block}
+.primary{background:#111827;color:#fff}
+.secondary{background:#e5e7eb;color:#111827}
+.status{margin:14px 0;color:var(--muted);font-weight:700}
+.game{display:grid;grid-template-columns:1fr auto;gap:14px;padding:14px 0;border-bottom:1px solid #e5e7eb}
+.game:last-child{border-bottom:0}
+.game small{color:var(--muted)}
+.game-score{text-align:right;font-size:18px;font-weight:800;white-space:nowrap}
+.game-score small{display:block;font-size:12px;font-weight:600;margin-top:3px}
+.winner{font-size:34px;font-weight:900;text-align:center;margin-top:20px;padding:22px;border-radius:14px;background:#eef2ff}
+.standard{border-left:5px solid #d4a017;padding-left:12px}
+.breakdown-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.breakdown-item{background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:14px;text-align:center}
+.breakdown-item span{display:block;color:var(--muted);font-size:13px;margin-bottom:5px}
+.breakdown-item strong{font-size:24px;display:block}
+.breakdown-item small{display:block;color:var(--muted);margin-top:6px;line-height:1.35}
+@media(max-width:650px){.breakdown-grid{grid-template-columns:1fr}}
+@media(max-width:650px){
+.commissioner-report+.commissioner-report{margin-top:24px;padding-top:24px;border-top:2px solid var(--border)}
+.commissioner-title{text-align:center;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:900;margin:0 0 14px}
+.grade-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
+.grade-strip>div{border:1px solid var(--border);border-radius:14px;padding:17px 14px;text-align:center;background:#f8fafc}
+.grade-strip span{display:block;color:var(--muted);font-size:13px;margin-bottom:10px;line-height:1.25}
+.grade-strip strong{display:block;font-size:34px;line-height:1}
+.report-placeholder{padding:22px;text-align:center;color:var(--muted);background:#f8fafc;border-radius:14px}
+.overall-verdict{border-radius:14px;background:#111827;color:#fff;padding:20px;text-align:center;font-size:18px;line-height:1.45}
+.overall-verdict b{display:block;font-size:26px;margin-bottom:7px}
+@media(max-width:650px){.grade-strip{grid-template-columns:1fr}}
+
+</style>
+</head>
+<body>
+<main class="container">
+  <section class="hero">
+    <h1>Big Ten–SEC Challenge Simulation</h1>
+    <p>The draft created the matchups. This page exists solely to play the Challenge and determine the winner.</p>
+  </section>
+
+  <section class="card">
+    <div class="actions">
+      <button id="runBtn" class="primary">Simulate the Challenge</button>
+      <a class="button secondary" href="big-ten-sec-draft-simulator-v16.html">Return to Draft</a>
+    </div>
+    <div id="status" class="status">Ready to play all 16 games. Scores and margins are generated from the same rating spreads used for win probabilities.</div>
+    <div id="winner" class="winner" style="display:none"></div>
+  </section>
+
+  <section class="card verdict-card">
+    <div id="commissionerReports">
+      <div class="report-placeholder">Simulate the Challenge to receive the commissioner report card.</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Challenge Superlatives</h2>
+    <div id="summaryBreakdown">Run the simulation to reveal the biggest win, biggest upset, road performance, scoring margin, and records against the spread.</div>
+  </section>
+
+  <section class="card">
+    <h2>Game Results</h2>
+    <div id="games">Run the simulation to reveal each winner.</div>
+  </section>
+</main>
+
+<script>
+const params=new URLSearchParams(window.location.search);
+const encoded=params.get("draft");
+const demoDraft={"draftMode":"B10","philosophy":55,"champion":{"home":{"name":"Ohio State","r":90.0},"away":{"name":"Texas","r":89.0},"homeConf":"B10","p":0.5919119667227271,"line":"Ohio State -3.5","standardBearer":true},"games":[{"home":{"name":"Oregon","r":86.5},"away":{"name":"Georgia","r":85.5},"homeConf":"B10","p":0.5919119667227271,"line":"Oregon -3.5","grade":{"letter":"\u2014"}},{"home":{"name":"Alabama","r":80.5},"away":{"name":"Indiana","r":86.0},"homeConf":"SEC","p":0.42098041259948604,"line":"Indiana -3.0","grade":{"letter":"\u2014"}},{"home":{"name":"Michigan","r":81.0},"away":{"name":"Oklahoma","r":82.5},"homeConf":"B10","p":0.5265375393676139,"line":"Michigan -1.0","grade":{"letter":"\u2014"}},{"home":{"name":"Ole Miss","r":81.5},"away":{"name":"USC","r":81.5},"homeConf":"SEC","p":0.5660185351961015,"line":"Ole Miss -2.5","grade":{"letter":"\u2014"}},{"home":{"name":"Penn State","r":79.5},"away":{"name":"LSU","r":81.5},"homeConf":"B10","p":0.5132781272800339,"line":"Penn State -0.5","grade":{"letter":"\u2014"}},{"home":{"name":"Texas A&M","r":82.0},"away":{"name":"Washington","r":78.5},"homeConf":"SEC","p":0.654188113761243,"line":"Texas A&M -6.0","grade":{"letter":"\u2014"}},{"home":{"name":"Iowa","r":78.0},"away":{"name":"Tennessee","r":77.5},"homeConf":"B10","p":0.579019587400514,"line":"Iowa -3.0","grade":{"letter":"\u2014"}},{"home":{"name":"Florida","r":76.0},"away":{"name":"Nebraska","r":72.5},"homeConf":"SEC","p":0.654188113761243,"line":"Florida -6.0","grade":{"letter":"\u2014"}},{"home":{"name":"Illinois","r":72.0},"away":{"name":"Missouri","r":73.5},"homeConf":"B10","p":0.5265375393676139,"line":"Illinois -1.0","grade":{"letter":"\u2014"}},{"home":{"name":"Auburn","r":73.0},"away":{"name":"Minnesota","r":71.0},"homeConf":"SEC","p":0.617305023181202,"line":"Auburn -4.5","grade":{"letter":"\u2014"}},{"home":{"name":"Wisconsin","r":70.0},"away":{"name":"South Carolina","r":72.0},"homeConf":"B10","p":0.5132781272800339,"line":"Wisconsin -0.5","grade":{"letter":"\u2014"}},{"home":{"name":"Vanderbilt","r":69.5},"away":{"name":"UCLA","r":69.5},"homeConf":"SEC","p":0.5660185351961015,"line":"Vanderbilt -2.5","grade":{"letter":"\u2014"}},{"home":{"name":"Maryland","r":65.0},"away":{"name":"Arkansas","r":66.5},"homeConf":"B10","p":0.5265375393676139,"line":"Maryland -1.0","grade":{"letter":"\u2014"}},{"home":{"name":"Mississippi State","r":64.6},"away":{"name":"Northwestern","r":64.5},"homeConf":"SEC","p":0.5686266227261574,"line":"Mississippi State -2.6","grade":{"letter":"\u2014"}},{"home":{"name":"Rutgers","r":61.0},"away":{"name":"Kentucky","r":63.5},"homeConf":"B10","p":0.5,"line":"Pick'em","grade":{"letter":"\u2014"}}]};
+let draft=null;
+try{
+  draft=encoded
+    ? JSON.parse(decodeURIComponent(escape(atob(encoded))))
+    : demoDraft;
+  if(!encoded){
+    document.getElementById("status").textContent="Demo draft loaded. Simulate the Challenge to preview the full results experience.";
+  }
+}catch(e){
+  draft=demoDraft;
+  document.getElementById("status").textContent="Draft data could not be loaded, so a demo draft was loaded instead.";
+}
+
+function conferenceOf(team){
+  const b10=["Indiana","Ohio State","Oregon","Penn State","Michigan","USC","Iowa","Washington","Illinois","Nebraska","Northwestern","Wisconsin","Maryland","Minnesota","UCLA","Rutgers","Michigan State","Purdue"];
+  return b10.includes(team.name)?"B10":"SEC";
+}
+
+function simulate(){
+  const card=[draft.champion,...draft.games];
+  let b10Wins=0,secWins=0;
+  let b10Points=0,secPoints=0;
+  let b10RoadWins=0,secRoadWins=0;
+  let b10ATS=0,secATS=0,pushes=0;
+  let standardBearerWinner=null;
+  let biggestWin=null;
+  let biggestUpset=null;
+  let upsetCount=0;
+  let oneScoreGames=0;
+  let totalActualMargin=0;
+  let totalTV=0;
+  let marqueeGames=0;
+  const rows=[];
+  const gameOutcomes=[];
+
+  function parseSpread(line,home,away){
+    if(!line || line==="Pick'em") return {favorite:null,spread:0};
+    const split=line.lastIndexOf(" -");
+    if(split===-1) return {favorite:null,spread:0};
+    const favoriteName=line.slice(0,split);
+    const spread=parseFloat(line.slice(split+2));
+    if(favoriteName===home.name) return {favorite:"home",spread};
+    if(favoriteName===away.name) return {favorite:"away",spread};
+    return {favorite:null,spread:0};
+  }
+
+  function brandScore(team){
+    const r=team.r;
+    if(r>=86) return 100;
+    if(r>=81) return 88;
+    if(r>=77) return 76;
+    if(r>=72) return 62;
+    if(r>=66) return 48;
+    return 34;
+  }
+
+  function gameTVScore(g){
+    const spread=parseSpread(g.line,g.home,g.away).spread;
+    const competitiveness=Math.max(0,100-spread*5.5);
+    const brands=(brandScore(g.home)+brandScore(g.away))/2;
+    const location=conferenceOf(g.home)!==conferenceOf(g.away)?82:65;
+    return 0.30*brandScore(g.home)+0.30*brandScore(g.away)+0.30*competitiveness+0.10*location;
+  }
+
+  function letterGrade(score){
+    if(score>=93)return "A+";
+    if(score>=88)return "A";
+    if(score>=84)return "A−";
+    if(score>=80)return "B+";
+    if(score>=75)return "B";
+    if(score>=70)return "B−";
+    if(score>=65)return "C+";
+    if(score>=60)return "C";
+    if(score>=55)return "C−";
+    if(score>=48)return "D";
+    return "F";
+  }
+
+  function randomNormal(){
+    // Box-Muller transform: one standard-normal draw.
+    let u=0,v=0;
+    while(u===0) u=Math.random();
+    while(v===0) v=Math.random();
+    return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+  }
+
+  function projectedHomeMargin(g){
+    const spreadInfo=parseSpread(g.line,g.home,g.away);
+    if(spreadInfo.favorite==="home") return spreadInfo.spread;
+    if(spreadInfo.favorite==="away") return -spreadInfo.spread;
+    return 0;
+  }
+
+  function createScore(g){
+    const expectedHomeMargin=projectedHomeMargin(g);
+    const spread=Math.abs(expectedHomeMargin);
+
+    // Close projected games can still separate, but extreme 30–40 point
+    // outcomes are reserved for genuinely lopsided matchups.
+    let homeMargin=Math.round(expectedHomeMargin+12.5*randomNormal());
+    let marginCap;
+    if(spread<=3) marginCap=21;
+    else if(spread<=7) marginCap=24;
+    else if(spread<=14) marginCap=31;
+    else marginCap=45;
+
+    homeMargin=Math.max(-marginCap,Math.min(marginCap,homeMargin));
+    if(homeMargin===0) homeMargin=Math.random()<0.5?-1:1;
+
+    let total=Math.round(51+10*randomNormal());
+    total=Math.max(30,Math.min(79,total));
+
+    if((total+homeMargin)%2!==0) total+=1;
+
+    let homeScore=Math.round((total+homeMargin)/2);
+    let awayScore=total-homeScore;
+
+    if(homeScore<3){
+      awayScore+=3-homeScore;
+      homeScore=3;
+    }
+    if(awayScore<3){
+      homeScore+=3-awayScore;
+      awayScore=3;
+    }
+
+    if(homeScore===awayScore){
+      if(homeMargin>0) homeScore+=1;
+      else awayScore+=1;
+    }
+
+    return {homeScore,awayScore};
+  }
+
+  card.forEach((g,i)=>{
+    const score=createScore(g);
+    const homeWon=score.homeScore>score.awayScore;
+    const winner=homeWon?g.home:g.away;
+    const loser=homeWon?g.away:g.home;
+    const winnerScore=homeWon?score.homeScore:score.awayScore;
+    const loserScore=homeWon?score.awayScore:score.homeScore;
+    const margin=winnerScore-loserScore;
+    const winnerConf=conferenceOf(winner);
+    const gameTV=gameTVScore(g);
+    totalTV+=gameTV;
+    totalActualMargin+=margin;
+    if(margin<=8) oneScoreGames++;
+    if(gameTV>=82) marqueeGames++;
+
+    if(winnerConf==="B10") b10Wins++; else secWins++;
+
+    if(conferenceOf(g.home)==="B10"){
+      b10Points+=score.homeScore;
+      secPoints+=score.awayScore;
+    }else{
+      secPoints+=score.homeScore;
+      b10Points+=score.awayScore;
+    }
+
+    if(!homeWon){
+      if(winnerConf==="B10") b10RoadWins++;
+      else secRoadWins++;
+    }
+
+    if(i===0) standardBearerWinner=winnerConf;
+
+    const spreadInfo=parseSpread(g.line,g.home,g.away);
+    const actualHomeMargin=score.homeScore-score.awayScore;
+    let coverConf=null;
+    let isPush=false;
+
+    if(spreadInfo.favorite==="home"){
+      const atsMargin=actualHomeMargin-spreadInfo.spread;
+      if(Math.abs(atsMargin)<0.001) isPush=true;
+      else coverConf=atsMargin>0?conferenceOf(g.home):conferenceOf(g.away);
+    }else if(spreadInfo.favorite==="away"){
+      const actualAwayMargin=-actualHomeMargin;
+      const atsMargin=actualAwayMargin-spreadInfo.spread;
+      if(Math.abs(atsMargin)<0.001) isPush=true;
+      else coverConf=atsMargin>0?conferenceOf(g.away):conferenceOf(g.home);
+    }else{
+      coverConf=winnerConf;
+    }
+
+    if(isPush) pushes++;
+    else if(coverConf==="B10") b10ATS++;
+    else if(coverConf==="SEC") secATS++;
+
+    const favoriteWon=spreadInfo.favorite==="home"
+      ? homeWon
+      : spreadInfo.favorite==="away"
+        ? !homeWon
+        : null;
+
+    if(favoriteWon===false){
+      upsetCount++;
+      if(!biggestUpset || spreadInfo.spread>biggestUpset.spread){
+        biggestUpset={
+          winner:winner.name,
+          loser:loser.name,
+          spread:spreadInfo.spread,
+          score:`${winnerScore}–${loserScore}`
+        };
+      }
+    }
+
+    if(!biggestWin || margin>biggestWin.margin){
+      biggestWin={
+        winner:winner.name,
+        loser:loser.name,
+        margin,
+        score:`${winnerScore}–${loserScore}`
+      };
+    }
+
+    gameOutcomes.push({
+      game:g,
+      winnerConf,
+      margin,
+      gameTV,
+      oneScore:margin<=8,
+      upset:favoriteWon===false
+    });
+
+    rows.push(`<div class="game ${i===0?"standard":""}">
+      <div>
+        <b>${i===0?"Standard Bearer Game":`Game ${i}`}: ${g.away.name} at ${g.home.name}</b><br>
+        <small>${g.line}${g.grade && g.grade.letter && g.grade.letter!=="—"?` · Draft grade ${g.grade.letter}`:""}</small>
+      </div>
+      <div class="game-score">
+        ${g.away.name} ${score.awayScore}<br>
+        ${g.home.name} ${score.homeScore}
+        <small>${winner.name} by ${margin}</small>
+      </div>
+    </div>`);
+  });
+
+  document.getElementById("games").innerHTML=rows.join("");
+
+  let winnerText;
+  if(b10Wins>secWins){
+    winnerText=`BIG TEN WINS THE CHALLENGE, ${b10Wins}–${secWins}`;
+  }else if(secWins>b10Wins){
+    winnerText=`SEC WINS THE CHALLENGE, ${secWins}–${b10Wins}`;
+  }else{
+    const champ=standardBearerWinner==="B10"?"BIG TEN":"SEC";
+    winnerText=`CHALLENGE TIED 8–8 — ${champ} WINS THE STANDARD BEARER TIEBREAKER`;
+  }
+
+  const averageMargin=Math.abs(b10Points-secPoints)/card.length;
+  const avgMarginLeader=b10Points===secPoints
+    ? "Even"
+    : `${b10Points>secPoints?"Big Ten":"SEC"} +${averageMargin.toFixed(1)} per game`;
+
+  const biggestUpsetText=biggestUpset
+    ? `${biggestUpset.score} over ${biggestUpset.loser} as a ${biggestUpset.spread.toFixed(1)}-point underdog`
+    : "No underdog won";
+
+  const averageTV=totalTV/card.length;
+  const closeRate=oneScoreGames/card.length;
+  const averageActualMargin=totalActualMargin/card.length;
+
+  function commissionerReport(conf){
+    const confName=conf==="B10"?"Big Ten":"SEC";
+    const confWins=conf==="B10"?b10Wins:secWins;
+    const opponentWins=conf==="B10"?secWins:b10Wins;
+    const wonChallenge=confWins>opponentWins || (confWins===opponentWins && standardBearerWinner===conf);
+    const resultScore=Math.max(35,Math.min(100,50+(confWins-8)*10+(confWins===opponentWins&&standardBearerWinner===conf?4:0)));
+
+    // Grade only the home games selected by this commissioner. The Standard
+    // Bearer is excluded because it is selected before the draft itself.
+    const confGames=draft.games.filter(g=>g.homeConf===conf);
+    const confOutcomes=gameOutcomes.filter(o=>!o.game.standardBearer && o.game.homeConf===conf);
+    const draftTVScore=confGames.length
+      ? confGames.reduce((sum,g)=>sum+gameTVScore(g),0)/confGames.length
+      : averageTV;
+    const strategicGames=confGames.filter(g=>g.grade&&typeof g.grade.score==="number");
+    const strategicDraftScore=strategicGames.length
+      ? strategicGames.reduce((sum,g)=>sum+g.grade.score,0)/strategicGames.length
+      : draftTVScore;
+
+    const confCloseRate=confOutcomes.length
+      ? confOutcomes.filter(o=>o.oneScore).length/confOutcomes.length
+      : closeRate;
+    const confUpsets=confOutcomes.filter(o=>o.upset).length;
+    const confMarquee=confOutcomes.filter(o=>o.gameTV>=82).length;
+    const confAverageMargin=confOutcomes.length
+      ? confOutcomes.reduce((sum,o)=>sum+o.margin,0)/confOutcomes.length
+      : averageActualMargin;
+
+    let resultsEntertainmentScore=0.68*(confCloseRate*100)+
+      0.20*Math.min(100,confUpsets*25)+
+      0.12*Math.min(100,confMarquee*18);
+    if(confAverageMargin>14) resultsEntertainmentScore-=10;
+    if(confAverageMargin>18) resultsEntertainmentScore-=8;
+    resultsEntertainmentScore=Math.max(0,Math.min(100,resultsEntertainmentScore));
+
+    const tvNetworkScore=0.75*draftTVScore+0.25*resultsEntertainmentScore;
+    const decisionScore=0.55*strategicDraftScore+0.45*draftTVScore;
+    const commissionerScore=Math.max(0,Math.min(100,
+      0.75*decisionScore+0.25*resultScore+
+      (decisionScore>=78&&resultScore>=75?4:0)
+    ));
+
+    let verdictTitle,verdictCopy;
+    if(wonChallenge && tvNetworkScore>=84){
+      verdictTitle="Master Commissioner";
+      verdictCopy="You built appointment television and still brought the Challenge trophy home. The networks, fans, and conference presidents all win.";
+    }else if(!wonChallenge && tvNetworkScore>=84){
+      verdictTitle="TV Networks Love You… The Conference, Not So Much";
+      verdictCopy="You delivered blockbuster brands and compelling games, but your conference paid for the entertainment with a loss.";
+    }else if(wonChallenge && tvNetworkScore<58){
+      verdictTitle="You Won… But At What Cost?";
+      verdictCopy="The trophy is yours, but the schedule was dominated by predictable mismatches and limited marquee inventory.";
+    }else if(wonChallenge && tvNetworkScore<72){
+      verdictTitle="Chess Master";
+      verdictCopy="It was not always pretty, but you engineered favorable matchups and finished the job.";
+    }else if(!wonChallenge && tvNetworkScore<62){
+      verdictTitle="Too Clever by Half";
+      verdictCopy="The television product suffered, and the conservative matchup strategy still did not produce a conference win.";
+    }else if(confCloseRate>=0.60 && confMarquee>=3){
+      verdictTitle="Instant Classic";
+      verdictCopy="Major brands, one-score finishes, and genuine uncertainty made this Challenge feel like an annual tradition immediately.";
+    }else if(tvNetworkScore>=78){
+      verdictTitle="Money Printer";
+      verdictCopy="The network inventory was loaded with games people would actually plan their Saturday around.";
+    }else{
+      verdictTitle="Solid Commissioner Work";
+      verdictCopy="The Challenge delivered a credible mix of competitive games, recognizable brands, and strategic conference value.";
+    }
+
+    return {
+      conf,confName,resultScore,tvNetworkScore,commissionerScore,
+      draftTVScore,resultsEntertainmentScore,verdictTitle,verdictCopy
+    };
+  }
+
+  const reportConfs=draft.draftMode==="BOTH"
+    ? ["B10","SEC"]
+    : [draft.draftMode==="SEC"?"SEC":"B10"];
+  const reports=reportConfs.map(commissionerReport);
+  document.getElementById("commissionerReports").innerHTML=reports.map(r=>`
+    <section class="commissioner-report">
+      <h2 class="commissioner-title">${r.confName} Commissioner Report Card</h2>
+      <div class="grade-strip">
+        <div><span>Challenge Result</span><strong>${letterGrade(r.resultScore)}</strong></div>
+        <div><span>TV Network Grade</span><strong>${letterGrade(r.tvNetworkScore)}</strong></div>
+        <div><span>Commissioner Grade</span><strong>${letterGrade(r.commissionerScore)}</strong></div>
+      </div>
+      <div class="overall-verdict"><b>${r.verdictTitle}</b>${r.verdictCopy}</div>
+    </section>
+  `).join("");
+
+  // The superlative TV line reflects the full Challenge card, while each
+  // commissioner report above scores only that commissioner's selections.
+  const fullDraftTVScore=Math.max(0,Math.min(100,averageTV));
+  let fullResultsEntertainment=0.68*(closeRate*100)+
+    0.20*Math.min(100,upsetCount*18)+
+    0.12*Math.min(100,marqueeGames*12.5);
+  if(averageActualMargin>14) fullResultsEntertainment-=10;
+  if(averageActualMargin>18) fullResultsEntertainment-=8;
+  fullResultsEntertainment=Math.max(0,Math.min(100,fullResultsEntertainment));
+  const tvNetworkScore=0.75*fullDraftTVScore+0.25*fullResultsEntertainment;
+
+  document.getElementById("summaryBreakdown").innerHTML=`
+    <div class="breakdown-grid">
+      <div class="breakdown-item"><span>Biggest Win</span><strong>${biggestWin.winner} by ${biggestWin.margin}</strong><small>${biggestWin.score} over ${biggestWin.loser}</small></div>
+      <div class="breakdown-item"><span>Biggest Upset</span><strong>${biggestUpset?biggestUpset.winner:"None"}</strong><small>${biggestUpsetText}</small></div>
+      <div class="breakdown-item"><span>Total Upsets</span><strong>${upsetCount}</strong></div>
+      <div class="breakdown-item"><span>Big Ten Road Wins</span><strong>${b10RoadWins}</strong></div>
+      <div class="breakdown-item"><span>SEC Road Wins</span><strong>${secRoadWins}</strong></div>
+      <div class="breakdown-item"><span>Average Scoring Margin</span><strong>${avgMarginLeader}</strong><small>Big Ten ${b10Points}, SEC ${secPoints}</small></div>
+      <div class="breakdown-item"><span>Big Ten ATS</span><strong>${b10ATS}–${secATS}${pushes?`–${pushes}`:""}</strong></div>
+      <div class="breakdown-item"><span>SEC ATS</span><strong>${secATS}–${b10ATS}${pushes?`–${pushes}`:""}</strong></div>
+      <div class="breakdown-item"><span>TV Network Grade</span><strong>${letterGrade(tvNetworkScore)}</strong><small>75% draft (${letterGrade(fullDraftTVScore)}) · 25% results (${letterGrade(fullResultsEntertainment)})</small></div>
+      <div class="breakdown-item"><span>Average Game Margin</span><strong>${averageActualMargin.toFixed(1)} points</strong></div>
+      <div class="breakdown-item"><span>Standard Bearer Winner</span><strong>${standardBearerWinner==="B10"?"Big Ten":"SEC"}</strong></div>
+    </div>`;
+
+  const winner=document.getElementById("winner");
+  winner.textContent=winnerText;
+  winner.style.display="block";
+  document.getElementById("status").textContent="Challenge complete.";
+}
+document.getElementById("runBtn").addEventListener("click",simulate);
+</script>
+</body>
+</html>

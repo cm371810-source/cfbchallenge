@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Big Ten vs SEC Challenge Draft Simulator</title>
+<style>
+  :root{
+    --bg:#f4f6f8; --panel:#ffffff; --ink:#15202b; --muted:#6b7280;
+    --b10:#1f4e8c; --sec:#7b1e2b; --accent:#0f766e; --line:#d7dde5;
+    --disabled:#d7dbe0; --disabledText:#7a8088; --selected:#f4c95d;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+  header{background:#101820;color:#fff;padding:18px 22px}
+  header h1{margin:0;font-size:clamp(20px,3vw,32px)}
+  header p{margin:6px 0 0;color:#d9e0e8}
+  .shell{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px;padding:18px;max-width:1500px;margin:auto}
+  .main,.sidebar{background:var(--panel);border:1px solid var(--line);border-radius:14px}
+  .main{padding:18px}
+  .sidebar{padding:16px;position:sticky;top:12px;align-self:start;max-height:calc(100vh - 24px);overflow:auto}
+  .setup{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end;margin-bottom:10px}
+  .standard-copy{background:#fff7d6;border:1px solid #e5c75f;border-radius:12px;padding:14px;margin-bottom:14px}
+  .standard-copy h2{margin:0 0 6px;font-size:20px}
+  .standard-copy p{margin:0;color:#4b5563;line-height:1.4}
+  .computer-choice{padding:10px;border:1px solid #bbc4cf;border-radius:9px;background:#f3f5f7;font-weight:700}
+  .pick-grade{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:8px;
+    color:#fff;font-weight:900;font-size:16px;vertical-align:middle;margin-left:8px}
+  .grade-a{background:#166534}.grade-b{background:#65a30d}.grade-c{background:#eab308;color:#422006}
+  .grade-d{background:#ea580c}.grade-f{background:#b91c1c}
+  .grade-row{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:8px}
+  .grade-note{font-size:13px;color:var(--muted)}
+
+  label{font-weight:700;font-size:14px}
+  select,button{font:inherit}
+  select{width:100%;padding:10px;border:1px solid #bbc4cf;border-radius:9px;background:#fff}
+  button{border:0;border-radius:9px;padding:10px 14px;font-weight:700;cursor:pointer}
+  button:disabled{cursor:not-allowed}
+  .primary{background:#101820;color:#fff}
+  .secondary{background:#e9edf2;color:#101820}
+  .sim{background:var(--accent);color:#fff;width:100%;margin-top:12px;font-size:17px}
+  .sim:disabled{background:#9aa6a3}
+  .status{padding:12px;border-radius:10px;background:#eef3f8;margin-bottom:14px;font-weight:700;text-align:center}
+  .matchup{display:grid;grid-template-columns:1fr 64px 1fr;gap:12px;align-items:center;margin:12px 0 18px}
+  .slot{border:2px solid var(--line);border-radius:12px;min-height:110px;padding:14px;text-align:center;display:flex;flex-direction:column;justify-content:center}
+  .slot small{color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+  .slot strong{font-size:clamp(22px,4vw,36px);margin-top:8px}
+  .versus{text-align:center;font-weight:900;font-size:22px}
+  .linebox{text-align:center;min-height:48px;margin-bottom:16px}
+  .linebox strong{font-size:20px}
+  .teams{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .conf h2{text-align:center;margin:0 0 10px}
+  .conf.b10 h2{color:var(--b10)}
+  .conf.sec h2{color:var(--sec)}
+  .team-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .team-btn{background:#fff;border:2px solid var(--line);color:var(--ink);padding:10px 8px}
+  .team-btn.b10:hover:not(:disabled){border-color:var(--b10)}
+  .team-btn.sec:hover:not(:disabled){border-color:var(--sec)}
+  .team-btn.selected{background:var(--selected);border-color:#b78613}
+  .team-btn.used,.team-btn:disabled{background:var(--disabled);color:var(--disabledText);border-color:#c5cbd2}
+  .team-btn.champion{background:#cbd5e1;color:#334155}
+  .metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+  .metric{background:#f3f5f7;border-radius:10px;padding:10px;text-align:center}
+  .metric span{display:block;color:var(--muted);font-size:12px;font-weight:700}
+  .metric strong{display:block;font-size:22px;margin-top:3px}
+  .draft-list{list-style:none;padding:0;margin:0}
+  .draft-list li{padding:10px 0;border-bottom:1px solid var(--line)}
+  .draft-list b{display:block}
+  .draft-list small{color:var(--muted)}
+  .champion-card{background:#fff7d6;border:1px solid #e5c75f;border-radius:10px;padding:10px;margin-bottom:12px}
+  .result-panel{margin-top:14px;padding:12px;background:#edf8f6;border:1px solid #acd5ce;border-radius:10px}
+  .result-game{padding:7px 0;border-bottom:1px solid #cce2de}
+  .result-game:last-child{border-bottom:0}
+  .computer-flash{animation:pulse .55s ease-in-out 2}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.035);box-shadow:0 0 0 4px rgba(244,201,93,.45)}}
+  @media(max-width:900px){
+    .shell{grid-template-columns:1fr}
+    .sidebar{position:static;max-height:none}
+  }
+  @media(max-width:620px){
+    .setup{grid-template-columns:1fr}
+    .matchup{grid-template-columns:1fr}
+    .versus{padding:0}
+    .teams{grid-template-columns:1fr}
+    .team-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .mode-toggle{grid-template-columns:1fr}
+  }
+
+  .mode-panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin:14px 0}
+  .mode-label{display:block;font-weight:800;margin-bottom:9px}
+  .mode-toggle{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .mode-toggle label{cursor:pointer}
+  .mode-toggle input{position:absolute;opacity:0;pointer-events:none}
+  .mode-toggle span{display:block;text-align:center;border:1px solid var(--line);border-radius:9px;padding:10px 8px;font-weight:700;background:#f8fafc}
+  .mode-toggle input:checked+span{background:#111827;color:#fff;border-color:#111827}
+  .mode-panel small{display:block;color:var(--muted);margin-top:9px}
+
+
+  .philosophy-panel{background:#fff;border:1px solid var(--border);border-radius:16px;padding:18px;margin:0 0 18px}
+  .philosophy-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:10px}
+  .philosophy-heading strong{display:block;font-size:18px;margin-top:3px}
+  .philosophy-heading>span{font-weight:800;color:var(--navy)}
+  .philosophy-panel input[type="range"]{width:100%;accent-color:var(--navy)}
+  .philosophy-ends{display:flex;justify-content:space-between;margin-top:6px}
+  .philosophy-ends span{display:flex;flex-direction:column}
+  .philosophy-ends span:last-child{text-align:right}
+  .philosophy-ends small,.philosophy-panel>small{color:var(--muted)}
+
+
+  .draft-order-card{border:1px solid var(--border);border-radius:14px;padding:14px;margin:14px 0;background:#f8fafc}
+  .draft-order-card h3{margin:0 0 5px}
+  .draft-order-card>small{display:block;color:var(--muted);line-height:1.35;margin-bottom:10px}
+  .draft-order-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:5px}
+  .draft-order-list li{display:flex;align-items:center;gap:7px;padding:7px 8px;border-radius:8px;background:#fff;border:1px solid var(--border);font-size:12px;font-weight:700}
+  .draft-order-list li .pick-no{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:#e5e7eb;font-size:11px}
+  .draft-order-list li.b10-order{border-left:4px solid #2563eb}
+  .draft-order-list li.sec-order{border-left:4px solid #dc2626}
+  .draft-order-list li.current-order{outline:2px solid #111827;background:#fff7cc;transform:translateY(-1px)}
+  .draft-order-list li.completed-order{grid-column:1/-1;opacity:1;padding:10px 11px;align-items:flex-start}
+  .draft-order-list li.completed-order .pick-result{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;width:100%}
+  .draft-order-list li.completed-order .pick-matchup{font-size:13px;line-height:1.25}
+  .draft-order-list li.completed-order .pick-line{font-size:11px;color:var(--muted);font-weight:500}
+  .draft-order-list li.completed-order .pick-grade{grid-row:1/3;grid-column:2;width:30px;height:30px;font-size:13px;float:none}
+  .draft-order-list li.current-order{grid-column:1/-1;padding:10px 11px}
+  .draft-order-list li.current-order .current-copy{font-size:13px}
+  .draft-order-list li.current-order .current-copy small{display:block;color:var(--muted);font-weight:500;margin-top:2px}
+
+</style>
+</head>
+<body>
+<header>
+  <h1>Big Ten vs SEC Challenge Draft Simulator</h1>
+  <p>Choose champions, draft home matchups, then run the Challenge. Choose which commissioner seat to control, build the matchups, then run the Challenge.</p>
+</header>
+
+<div class="shell">
+  <main class="main">
+    <section class="standard-copy">
+      <h2>Standard Bearer Game</h2>
+      <p>
+        Before the draft begins, each conference names one Standard Bearer for the
+        tiebreaking final game. If the Challenge finishes 8–8, the winner of this
+        matchup wins the Challenge.
+      </p>
+    </section>
+
+
+    <section class="mode-panel">
+      <span class="mode-label">Commissioner Control</span>
+      <div class="mode-toggle" role="radiogroup" aria-label="Choose which conference to draft as">
+        <label><input type="radio" name="draftMode" value="B10" checked><span>Draft as Big Ten</span></label>
+        <label><input type="radio" name="draftMode" value="SEC"><span>Draft as SEC</span></label>
+        <label><input type="radio" name="draftMode" value="BOTH"><span>Draft as Both</span></label>
+      </div>
+      <small id="modeHelp">You control Big Ten home picks. The computer controls SEC home picks.</small>
+    </section>
+
+
+    <section class="philosophy-panel">
+      <div class="philosophy-heading">
+        <div>
+          <span class="mode-label">Commissioner Philosophy</span>
+          <strong id="philosophyName">Balanced Commissioner</strong>
+        </div>
+        <span id="philosophyValue">55% TV</span>
+      </div>
+      <input id="philosophySlider" type="range" min="0" max="100" value="55" step="1"
+        aria-label="Commissioner philosophy from easy wins to biggest and best games">
+      <div class="philosophy-ends">
+        <span><b>Game Theory</b><small>Easy wins</small></span>
+        <span><b>Biggest &amp; Best</b><small>TV blockbusters</small></span>
+      </div>
+      <small id="philosophyHelp">Balances conference win probability with marquee, competitive television matchups.</small>
+    </section>
+
+    <section class="setup">
+      <div>
+        <label>Big Ten Standard Bearer</label>
+        <select id="b10Champ"></select>
+        <div id="b10AutoChoice" class="computer-choice" style="display:none">Computer selects after you start</div>
+      </div>
+      <div>
+        <label>SEC Standard Bearer</label>
+        <select id="secChamp" style="display:none"></select>
+        <div id="secAutoChoice" class="computer-choice">Computer selects after you start</div>
+      </div>
+      <button id="startBtn" class="primary">Start Draft</button>
+    </section>
+
+    <div id="status" class="status">Choose the draft mode and Standard Bearer selection, then begin.</div>
+
+    <section class="matchup">
+      <div class="slot">
+        <small>Home Team</small>
+        <strong id="homeSlot">—</strong>
+      </div>
+      <div class="versus">VS</div>
+      <div class="slot">
+        <small>Away Team</small>
+        <strong id="awaySlot">—</strong>
+      </div>
+    </section>
+
+    <div id="lineBox" class="linebox"></div>
+
+    <section class="teams">
+      <div class="conf b10">
+        <h2>Big Ten</h2>
+        <div id="b10Grid" class="team-grid"></div>
+      </div>
+      <div class="conf sec">
+        <h2>SEC</h2>
+        <div id="secGrid" class="team-grid"></div>
+      </div>
+    </section>
+  </main>
+
+  <aside class="sidebar">
+    <div class="champion-card">
+      <b>Standard Bearer Game</b>
+      <div id="championGame">Not selected</div>
+      <small>The Big Ten Standard Bearer hosts in this version, giving each conference eight home games across 16 total games.</small>
+    </div>
+
+
+    <div class="draft-order-card">
+      <h3>Draft Order</h3>
+      <small>Each conference drafts its own home teams. The SEC receives consecutive picks at 8 and 9.</small>
+      <ol id="draftOrderList" class="draft-order-list"></ol>
+    </div>
+
+    <div class="metrics">
+      <div class="metric"><span>Current Pick</span><strong id="pickMetric">—</strong></div>
+      <div class="metric"><span>Drafted Games</span><strong id="gamesMetric">0/15</strong></div>
+          </div>
+<button id="simBtn" class="sim" disabled>Go to Challenge Simulation</button>
+    <button id="resetBtn" class="secondary" style="width:100%;margin-top:8px">Reset</button>
+
+    <div id="results"></div>
+  </aside>
+</div>
+
+<script>
+const HFA = 2.5;
+const SD = 16.0;
+const SIMS = 30000;
+
+// Ratings blend the prior model with small market-informed corrections and a modest one-point lift to the lower half of the Big Ten.
+ // Matchup futures serve as guardrails, while conference-title odds mainly
+ // reorder teams that were already close. Differences create projected spreads.
+const bigTen = [
+  {name:"Ohio State",r:90.0},{name:"Oregon",r:86.5},{name:"Indiana",r:86.0},
+  {name:"USC",r:81.5},{name:"Michigan",r:81.0},{name:"Penn State",r:79.5},
+  {name:"Washington",r:78.5},{name:"Iowa",r:78.0},{name:"Illinois",r:72.0},
+  {name:"Nebraska",r:72.5},{name:"Minnesota",r:71.0},{name:"Wisconsin",r:70.0},
+  {name:"UCLA",r:69.5},{name:"Maryland",r:65.0},{name:"Northwestern",r:64.5},
+  {name:"Rutgers",r:61.0},{name:"Michigan State",r:60.5},{name:"Purdue",r:55.0}
+];
+
+const sec = [
+  {name:"Texas",r:89.0},{name:"Georgia",r:85.5},{name:"Oklahoma",r:82.5},
+  {name:"Texas A&M",r:82.0},{name:"Ole Miss",r:81.5},{name:"LSU",r:81.5},
+  {name:"Alabama",r:80.5},{name:"Tennessee",r:77.5},{name:"Florida",r:76.0},
+  {name:"Missouri",r:73.5},{name:"Auburn",r:73.0},{name:"South Carolina",r:72.0},
+  {name:"Vanderbilt",r:69.5},{name:"Arkansas",r:66.5},
+  {name:"Mississippi State",r:64.6},{name:"Kentucky",r:63.5}
+];
+
+// 15 draft picks. Big Ten champion game is at home.
+// Draft: B10 first; SEC gets consecutive picks 8 and 9.
+// Home totals: Big Ten champion + 7 draft homes = 8; SEC 8 draft homes = 8.
+const order = ["B10","SEC","B10","SEC","B10","SEC","B10","SEC","SEC","B10","SEC","B10","SEC","B10","SEC"];
+
+let usedB10 = new Set(), usedSEC = new Set();
+let games = [], pickIndex = 0, selectedHome = null, started = false, busy = false;
+let draftMode = "B10";
+let philosophy = 55;
+let champion = null;
+
+const $ = id => document.getElementById(id);
+
+function normalCDF(x){
+  const t = 1/(1+0.2316419*Math.abs(x));
+  const d = 0.3989423*Math.exp(-x*x/2);
+  let p = 1-d*t*(0.3193815+t*(-0.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));
+  return x>=0?p:1-p;
+}
+function homeWinProb(home, away){
+  return normalCDF((home.r + HFA - away.r)/SD);
+}
+function lineText(home,away){
+  const margin = home.r + HFA - away.r;
+  if(Math.abs(margin)<0.05) return "Pick'em";
+  return margin>0 ? `${home.name} -${margin.toFixed(1)}` : `${away.name} -${Math.abs(margin).toFixed(1)}`;
+}
+function fillSelect(el,teams){
+  el.innerHTML = teams.map(t=>`<option value="${t.name}">${t.name}</option>`).join("");
+}
+fillSelect($("b10Champ"),[...bigTen].sort((a,b)=>a.name.localeCompare(b.name)));
+fillSelect($("secChamp"),[...sec].sort((a,b)=>a.name.localeCompare(b.name)));
+
+
+
+function renderDraftOrder(){
+  const list=$("draftOrderList");
+  if(!list) return;
+  list.innerHTML=order.map((conf,i)=>{
+    const g=games[i];
+    const confName=conf==="B10"?"Big Ten":"SEC";
+    const confClass=conf==="B10"?"b10-order":"sec-order";
+    if(g){
+      return `<li class="${confClass} completed-order">
+        <span class="pick-no">${i+1}</span>
+        <div class="pick-result">
+          <span class="pick-matchup">${g.away.name} at ${g.home.name}</span>
+          <span class="pick-line">${g.line}</span>
+          <span class="pick-grade ${g.grade.cls}">${g.grade.letter}</span>
+        </div>
+      </li>`;
+    }
+    if(i===pickIndex && started){
+      return `<li class="${confClass} current-order">
+        <span class="pick-no">${i+1}</span>
+        <span class="current-copy"><b>${confName} on the clock</b><small>This pick will replace this slot when completed.</small></span>
+      </li>`;
+    }
+    return `<li class="${confClass}">
+      <span class="pick-no">${i+1}</span>
+      <span>${confName}</span>
+    </li>`;
+  }).join("");
+}
+renderDraftOrder();
+
+function updatePhilosophy(){
+  philosophy=Number($("philosophySlider").value);
+  let name,help;
+  if(philosophy<=20){
+    name="Game Theory";
+    help="Prioritizes projected wins, favorable spreads, and weak remaining opponents.";
+  }else if(philosophy<=42){
+    name="Win-First Commissioner";
+    help="Leans toward favorable matchups while preserving some television value.";
+  }else if(philosophy<=65){
+    name="Balanced Commissioner";
+    help="Balances conference win probability with marquee, competitive television matchups.";
+  }else if(philosophy<=84){
+    name="TV Executive";
+    help="Prioritizes strong brands and compelling games, even when they create more risk.";
+  }else{
+    name="Biggest & Best";
+    help="Chases blockbuster brands and tight projected spreads almost regardless of risk.";
+  }
+  $("philosophyName").textContent=name;
+  $("philosophyValue").textContent=`${philosophy}% TV`;
+  $("philosophyHelp").textContent=help;
+}
+$("philosophySlider").addEventListener("input",updatePhilosophy);
+updatePhilosophy();
+
+function getTeam(conf,name){
+  return (conf==="B10"?bigTen:sec).find(t=>t.name===name);
+}
+
+function isHumanTurn(conf){
+  return draftMode==="BOTH" || draftMode===conf;
+}
+function opponentConf(conf){
+  return conf==="B10"?"SEC":"B10";
+}
+function confLabel(conf){
+  return conf==="B10"?"Big Ten":"SEC";
+}
+function updateModeHelp(){
+  const text=draftMode==="B10"
+    ? "You control the Big Ten Standard Bearer and Big Ten home picks. The computer controls the SEC."
+    : draftMode==="SEC"
+      ? "You control the SEC Standard Bearer and SEC home picks. The computer controls the Big Ten."
+      : "You control both Standard Bearers and every home-team and opponent selection.";
+  $("modeHelp").textContent=text;
+
+  const b10Human=draftMode==="B10" || draftMode==="BOTH";
+  const secHuman=draftMode==="SEC" || draftMode==="BOTH";
+
+  $("b10Champ").style.display=b10Human?"block":"none";
+  $("b10AutoChoice").style.display=b10Human?"none":"block";
+  $("secChamp").style.display=secHuman?"block":"none";
+  $("secAutoChoice").style.display=secHuman?"none":"block";
+}
+
+function renderButtons(){
+  renderGrid("B10", [...bigTen].sort((a,b)=>a.name.localeCompare(b.name)), $("b10Grid"), usedB10);
+  renderGrid("SEC", [...sec].sort((a,b)=>a.name.localeCompare(b.name)), $("secGrid"), usedSEC);
+}
+function renderGrid(conf,teams,grid,used){
+  grid.innerHTML="";
+  teams.forEach(t=>{
+    const b=document.createElement("button");
+    b.type="button";
+    b.textContent=t.name;
+    b.className=`team-btn ${conf==="B10"?"b10":"sec"}`;
+    const isChamp = champion && ((conf==="B10"&&champion.b10.name===t.name)||(conf==="SEC"&&champion.sec.name===t.name));
+    const isUsed=used.has(t.name);
+    if(isChamp){b.disabled=true;b.classList.add("champion");b.title="Standard Bearer Game";}
+    else if(isUsed){b.disabled=true;b.classList.add("used");}
+    if(selectedHome && selectedHome.conf===conf && selectedHome.team.name===t.name) b.classList.add("selected");
+    const currentConf=started && pickIndex<order.length ? order[pickIndex] : null;
+    const humanTurn=currentConf && isHumanTurn(currentConf);
+    const selectableHome=humanTurn && conf===currentConf;
+    const selectableAway=humanTurn && selectedHome && conf===opponentConf(currentConf);
+    if(!started || busy || (!selectableHome && !selectableAway)) b.disabled=true;
+    b.addEventListener("click",()=>teamClicked(conf,t));
+    grid.appendChild(b);
+  });
+}
+
+function chooseComputerStandardBearer(conf,opponent){
+  const pool=conf==="B10"?bigTen:sec;
+  return [...pool].sort((x,y)=>{
+    const xHome=conf==="B10"?x:opponent;
+    const xAway=conf==="B10"?opponent:x;
+    const yHome=conf==="B10"?y:opponent;
+    const yAway=conf==="B10"?opponent:y;
+    const xScore=0.75*tvProduct(xHome,xAway)+0.25*(brandScore[x.name]??50);
+    const yScore=0.75*tvProduct(yHome,yAway)+0.25*(brandScore[y.name]??50);
+    return yScore-xScore;
+  })[0];
+}
+
+function startDraft(){
+  draftMode=document.querySelector('input[name="draftMode"]:checked').value;
+  resetState(false);
+
+  let b,s;
+
+  if(draftMode==="B10"){
+    b=getTeam("B10",$("b10Champ").value);
+    s=chooseComputerStandardBearer("SEC",b);
+    $("secAutoChoice").textContent=s.name;
+  }else if(draftMode==="SEC"){
+    s=getTeam("SEC",$("secChamp").value);
+    b=chooseComputerStandardBearer("B10",s);
+    $("b10AutoChoice").textContent=b.name;
+  }else{
+    b=getTeam("B10",$("b10Champ").value);
+    s=getTeam("SEC",$("secChamp").value);
+  }
+
+  champion={b10:b,sec:s,home:b,away:s,p:homeWinProb(b,s)};
+  usedB10.add(b.name); usedSEC.add(s.name);
+  started=true;
+  $("championGame").innerHTML=`<b>${s.name} at ${b.name}</b><br><small>${lineText(b,s)} · TV ${tvProduct(b,s).toFixed(0)}</small>`;
+  $("startBtn").disabled=true;
+  $("philosophySlider").disabled=true;
+  $("b10Champ").disabled=true;
+  $("secChamp").disabled=true;
+  document.querySelectorAll('input[name="draftMode"]').forEach(el=>el.disabled=true);
+  renderButtons(); advanceTurn();
+}
+
+function advanceTurn(){
+  selectedHome=null;
+  $("homeSlot").textContent="—"; $("awaySlot").textContent="—"; $("lineBox").innerHTML="";
+  updateSidebar();
+  if(pickIndex>=order.length){
+    started=false;
+    $("status").textContent="Draft complete. Continue to the full Challenge simulation.";
+    $("simBtn").disabled=false;
+    renderButtons();
+    calculateChallengeOdds();
+    return;
+  }
+
+  const conf=order[pickIndex];
+  if(isHumanTurn(conf)){
+    busy=false;
+    $("status").textContent=`Pick ${pickIndex+1}: ${confLabel(conf)} — choose your home team, then choose a ${confLabel(opponentConf(conf))} opponent.`;
+    renderButtons();
+  }else{
+    computerPick(conf);
+  }
+}
+
+function teamClicked(conf,team){
+  if(!started || busy || pickIndex>=order.length) return;
+  const currentConf=order[pickIndex];
+  if(!isHumanTurn(currentConf)) return;
+
+  // Clicking another team from the drafting conference replaces the current
+  // home-team choice until the opponent is selected and the game is locked.
+  if(conf===currentConf){
+    selectedHome={conf:currentConf,team};
+    $("homeSlot").textContent=team.name;
+    $("awaySlot").textContent="—";
+    $("lineBox").innerHTML="";
+    $("status").textContent=`${team.name} selected as the ${confLabel(currentConf)} home team. Choose a ${confLabel(opponentConf(currentConf))} opponent, or click another home team to change your selection.`;
+    renderButtons();
+    return;
+  }
+
+  if(conf===opponentConf(currentConf) && selectedHome){
+    lockGame(selectedHome.team,team,currentConf);
+  }
+}
+
+
+const brandScore = {
+  "Ohio State":100,"Michigan":98,"Alabama":98,"Georgia":97,"Texas":97,"Penn State":92,
+  "Oklahoma":91,"USC":91,"Oregon":90,"LSU":90,"Texas A&M":88,"Tennessee":87,
+  "Florida":86,"Auburn":84,"Nebraska":83,"Ole Miss":82,"Iowa":79,"Wisconsin":78,
+  "Indiana":88,"Washington":76,"South Carolina":75,"Michigan State":74,"Arkansas":72,
+  "Missouri":70,"Illinois":70,"Kentucky":68,"Minnesota":66,"Maryland":64,
+  "Vanderbilt":62,"Mississippi State":61,"UCLA":60,"Northwestern":55,"Rutgers":52,
+  "Purdue":40
+};
+
+const locationScore = {
+  "Ohio State":100,"Michigan":99,"Penn State":96,"Oregon":94,"Nebraska":93,
+  "Iowa":91,"Wisconsin":90,"Indiana":88,"Washington":88,"USC":86,
+  "Michigan State":84,"Illinois":82,"Minnesota":80,"Maryland":75,"Purdue":72,
+  "Rutgers":68,"Northwestern":62,"UCLA":58,
+  "LSU":98,"Georgia":96,"Alabama":96,"Texas A&M":95,"Tennessee":94,
+  "Florida":92,"Auburn":91,"Texas":91,"Oklahoma":90,"South Carolina":86,
+  "Ole Miss":84,"Arkansas":84,"Missouri":80,"Mississippi State":79,
+  "Kentucky":78,"Vanderbilt":68
+};
+
+function spreadTVScore(home,away){
+  const margin=Math.abs((home.r+HFA)-away.r);
+  // Elite TV window: pick'em through one score. After seven points, blowouts
+  // are punished aggressively; a 30-point mismatch can carry a negative component.
+  if(margin<=3) return 100;
+  if(margin<=7) return 100-(margin-3)*2.5;  // 90 at 7
+  return 90-(margin-7)*6.5;                 // ~-60 at 30
+}
+
+function tvProduct(home,away){
+  const homeBrand=brandScore[home.name] ?? 50;
+  const awayBrand=brandScore[away.name] ?? 50;
+  const spread=spreadTVScore(home,away);
+  const location=locationScore[home.name] ?? 60;
+  const score=0.30*homeBrand+0.30*awayBrand+0.30*spread+0.10*location;
+  return Math.max(0,Math.min(100,score));
+}
+
+function opponentStrengthScore(team, opponentPool){
+  if(!opponentPool.length) return 50;
+  const ratings=opponentPool.map(t=>t.r);
+  const lo=Math.min(...ratings), hi=Math.max(...ratings);
+  if(hi===lo) return 100;
+  return 100*(team.r-lo)/(hi-lo);
+}
+
+function matchupDraftScore(home,away,homeConf){
+  const opponentPool=(homeConf==="SEC"?bigTen:sec).filter(t=>
+    !(homeConf==="SEC"?usedB10:usedSEC).has(t.name));
+
+  const p=homeWinProb(home,away)*100;
+  const tv=tvProduct(home,away);
+  const opponent=opponentStrengthScore(away,opponentPool);
+
+  // Strategic target: select the strongest remaining opponent this home team
+  // can realistically beat. A toss-up against an elite opponent is excellent.
+  // A near-certain win over a weak opponent is useful but not rewarded heavily.
+  // A marquee opponent that this team has almost no chance to beat is avoided.
+  let beatableElite;
+
+  if(p >= 50){
+    // Once favored, prioritize opponent quality and avoid excessive cherry-picking.
+    beatableElite = 0.62*opponent + 0.23*p + 0.15*tv;
+  }else if(p >= 42){
+    // Competitive underdogs can still be strong commissioner picks.
+    beatableElite = 0.52*opponent + 0.28*p + 0.20*tv;
+  }else{
+    // Below 42%, the opponent must be truly premium and the TV product strong
+    // to justify risking a likely loss.
+    beatableElite = 0.38*opponent + 0.42*p + 0.20*tv;
+  }
+
+  // Penalize obvious cherry-picks and hopeless sacrifices.
+  if(p >= 78 && opponent < 45) beatableElite -= 14;
+  if(p >= 85 && opponent < 60) beatableElite -= 8;
+  if(p < 32) beatableElite -= 16;
+  if(p < 24) beatableElite -= 12;
+
+  // Reward the ideal commissioner window: a credible favorite against
+  // one of the opponent's strongest remaining teams.
+  if(p >= 51 && p <= 68 && opponent >= 70) beatableElite += 10;
+  if(p >= 46 && p < 51 && opponent >= 85 && tv >= 82) beatableElite += 5;
+
+  return {tv,opponent,p,total:Math.max(0,Math.min(100,beatableElite))};
+}
+
+
+function draftPickGrade(home,away,homeConf){
+  const tv=tvProduct(home,away);
+  const p=homeWinProb(home,away)*100;
+  const opponentConf=homeConf==="B10"?"SEC":"B10";
+  const opponentPool=opponentConf==="SEC"?sec:bigTen;
+  const oppStrength=opponentStrengthScore(away,opponentPool);
+
+  // A great pick combines premium TV, a meaningful opponent, and a credible
+  // chance to win. Sure wins against weak teams are capped, while likely losses
+  // in poor television games are punished heavily.
+  let score=0.45*tv+0.30*oppStrength+0.25*p;
+
+  if(p>=78 && oppStrength<35) score=Math.min(score,76);     // OSU-Kentucky type ceiling
+  if(p<=28 && tv<45) score-=18;                            // Purdue-Texas type disaster
+  if(p<=20) score-=8;
+  if(tv>=90 && oppStrength>=75 && p>=42) score+=7;         // marquee, competitive swing game
+  score=Math.max(0,Math.min(100,score));
+
+  let letter, cls;
+  if(score>=94){letter="A+";cls="grade-a";}
+  else if(score>=88){letter="A";cls="grade-a";}
+  else if(score>=80){letter="B+";cls="grade-b";}
+  else if(score>=73){letter="B";cls="grade-b";}
+  else if(score>=65){letter="C+";cls="grade-c";}
+  else if(score>=57){letter="C";cls="grade-c";}
+  else if(score>=48){letter="D";cls="grade-d";}
+  else {letter="F";cls="grade-f";}
+  return {score,letter,cls,tv,p,oppStrength};
+}
+
+function conferenceDraftScore(conf){
+  const confGames=allGames().filter(g=>g.homeConf===conf && !g.champion);
+  if(!confGames.length) return {tv:0,opponent:0,win:0,total:0};
+
+  const fullOpponentPool=conf==="B10"?sec:bigTen;
+  const lo=Math.min(...fullOpponentPool.map(t=>t.r));
+  const hi=Math.max(...fullOpponentPool.map(t=>t.r));
+
+  const opponentScore=t=>{
+    if(hi===lo) return 100;
+    return 100*(t.r-lo)/(hi-lo);
+  };
+
+  const tv=confGames.reduce((s,g)=>s+tvProduct(g.home,g.away),0)/confGames.length;
+  const opponent=confGames.reduce((s,g)=>s+opponentScore(g.away),0)/confGames.length;
+  const win=confGames.reduce((s,g)=>s+g.p*100,0)/confGames.length;
+
+  // Balanced commissioner grade: strong opponents, credible wins, quality TV.
+  return {tv,opponent,win,total:0.40*opponent+0.35*win+0.25*tv};
+}
+
+
+function remainingStrengthScore(team,pool){
+  const vals=pool.map(t=>t.r);
+  const lo=Math.min(...vals), hi=Math.max(...vals);
+  return hi===lo?100:100*(team.r-lo)/(hi-lo);
+}
+
+function computerCandidateScore(home,away,homeConf,homePool,awayPool){
+  const base=matchupDraftScore(home,away,homeConf);
+  const homeStrength=remainingStrengthScore(home,homePool);
+  const awayStrength=remainingStrengthScore(away,awayPool);
+  const progress=pickIndex/Math.max(1,order.length-1);
+  const tvWeight=philosophy/100;
+  const winWeight=1-tvWeight;
+
+  // The slider blends easy-win game theory with brand-rich, competitive TV.
+  const winScore=0.72*base.p + 0.18*homeStrength + 0.10*(100-awayStrength);
+  const tvScore=0.72*base.tv + 0.18*awayStrength + 0.10*(100-Math.abs(base.p-50)*2);
+  let total=winWeight*winScore + tvWeight*tvScore;
+
+  // Avoid accidentally stranding elite home brands, especially on TV-heavy settings.
+  if(homeStrength>=82 && progress<0.75) total+=2+5*tvWeight;
+  if(base.p<25 && tvWeight<0.7) total-=12;
+  if(base.p>82 && base.tv<55 && tvWeight>0.55) total-=10;
+
+  return {...base,total:Math.max(0,Math.min(110,total))};
+}
+
+function computerPick(homeConf){
+  busy=true; renderButtons();
+  const awayConf=opponentConf(homeConf);
+  $("status").textContent=`Pick ${pickIndex+1}: ${confLabel(homeConf)} commissioner is matching its best available home teams against the strongest opponents they can realistically beat…`;
+
+  const homePool=(homeConf==="B10"?bigTen:sec).filter(t=>!(homeConf==="B10"?usedB10:usedSEC).has(t.name));
+  const awayPool=(awayConf==="B10"?bigTen:sec).filter(t=>!(awayConf==="B10"?usedB10:usedSEC).has(t.name));
+
+  const remainingSECHomeTurns=order.slice(pickIndex).filter(c=>c==="SEC").length;
+  const lateSECHunt=homeConf==="SEC" && remainingSECHomeTurns<=2;
+
+  // For the SEC's last two computer-controlled home games, stop chasing the
+  // strongest "winnable" opponent. Secure the weakest remaining Big Ten team.
+  const candidateAwayPool=lateSECHunt
+    ? [[...awayPool].sort((a,b)=>a.r-b.r)[0]]
+    : awayPool;
+
+  if(lateSECHunt){
+    $("status").textContent=`Pick ${pickIndex+1}: SEC commissioner is securing the weakest remaining Big Ten opponent for the closing stretch…`;
+  }
+
+  const candidates=[];
+  for(const h of homePool){
+    for(const a of candidateAwayPool){
+      const grades=computerCandidateScore(h,a,homeConf,homePool,awayPool);
+      const lateScore=lateSECHunt
+        ? 0.72*grades.p+0.18*grades.tv+0.10*remainingStrengthScore(h,homePool)
+        : grades.total;
+      candidates.push({h,a,score:lateScore,grades});
+    }
+  }
+
+  // Choose from the strongest handful rather than repeating the exact same
+  // mathematical maximum. Extreme slider settings are a little more decisive.
+  candidates.sort((a,b)=>b.score-a.score);
+  const poolSize=philosophy<15 || philosophy>90 ? 4 : 7;
+  const shortlist=candidates.slice(0,Math.min(poolSize,candidates.length));
+  const temperature=philosophy>=45 && philosophy<=70 ? 3.8 : 3.0;
+  const floor=shortlist[shortlist.length-1].score;
+  const weights=shortlist.map(c=>Math.exp((c.score-floor)/temperature));
+  let draw=Math.random()*weights.reduce((s,w)=>s+w,0);
+  let best=shortlist[0];
+  for(let i=0;i<shortlist.length;i++){
+    draw-=weights[i];
+    if(draw<=0){best=shortlist[i];break;}
+  }
+
+  setTimeout(()=>{
+    $("homeSlot").textContent=best.h.name;
+    $("status").textContent=`${confLabel(homeConf)} selects ${best.h.name} as the home team…`;
+    highlightButton(homeConf,best.h.name);
+    setTimeout(()=>{
+      $("status").textContent=`${confLabel(homeConf)} is choosing a ${confLabel(awayConf)} opponent for ${best.h.name}…`;
+      setTimeout(()=>{
+        $("awaySlot").textContent=best.a.name;
+        highlightButton(awayConf,best.a.name);
+        const previewGrade=draftPickGrade(best.h,best.a,homeConf);
+        $("lineBox").innerHTML=`<strong>${lineText(best.h,best.a)}</strong>
+          <div class="grade-row"><span>TV ${best.grades.tv.toFixed(0)}</span>
+          <span class="pick-grade ${previewGrade.cls}">${previewGrade.letter}</span></div>
+          <div class="grade-note">Draft pick grade ${previewGrade.score.toFixed(0)}/100</div>`;
+        setTimeout(()=>lockGame(best.h,best.a,homeConf),2200);
+      },1300);
+    },800);
+  },1100);
+}
+function highlightButton(conf,name){
+  const grid=conf==="B10"?$("b10Grid"):$("secGrid");
+  [...grid.children].forEach(b=>{if(b.textContent===name)b.classList.add("selected","computer-flash")});
+}
+
+function lockGame(home,away,homeConf){
+  const p=homeWinProb(home,away);
+  const grade=draftPickGrade(home,away,homeConf);
+  games.push({home,away,homeConf,p,line:lineText(home,away),grade});
+  if(homeConf==="B10"){usedB10.add(home.name);usedSEC.add(away.name);}
+  else{usedSEC.add(home.name);usedB10.add(away.name);}
+  $("homeSlot").textContent=home.name;
+  $("awaySlot").textContent=away.name;
+  $("lineBox").innerHTML=`<strong>${lineText(home,away)}</strong>
+    <div class="grade-row"><span>TV ${grade.tv.toFixed(0)}</span>
+    <span class="pick-grade ${grade.cls}">${grade.letter}</span></div>
+    <div class="grade-note">Draft pick grade ${grade.score.toFixed(0)}/100</div>`;
+  pickIndex++;
+  busy=true; renderButtons(); updateSidebar();
+  setTimeout(()=>{busy=false;advanceTurn();},1800);
+}
+
+function updateSidebar(){
+  renderDraftOrder();
+  $("pickMetric").textContent=pickIndex>=order.length?"Done":`${pickIndex+1}`;
+  $("gamesMetric").textContent=`${games.length}/15`;
+}
+
+function allGames(){
+  if(!champion)return games;
+  return [{home:champion.home,away:champion.away,homeConf:"B10",p:champion.p,line:lineText(champion.home,champion.away),champion:true},...games];
+}
+
+function calculateChallengeOdds(){}
+
+function runSimulation(){
+  const payload={
+    draftMode,
+    philosophy,
+    champion:{
+      home:champion.home,
+      away:champion.away,
+      homeConf:"B10",
+      p:champion.p,
+      line:lineText(champion.home,champion.away),
+      standardBearer:true
+    },
+    games:games.map(g=>({
+      home:g.home,
+      away:g.away,
+      homeConf:g.homeConf,
+      p:g.p,
+      line:g.line,
+      grade:g.grade
+    }))
+  };
+  const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+  window.location.href=`big-ten-sec-challenge-results-v16.html?draft=${encodeURIComponent(encoded)}`;
+}
+
+function resetState(clearChamp=true){
+  usedB10=new Set();usedSEC=new Set();games=[];pickIndex=0;selectedHome=null;started=false;busy=false;champion=null;
+  $("homeSlot").textContent="—";$("awaySlot").textContent="—";$("lineBox").innerHTML="";
+  $("results").innerHTML="";$("championGame").textContent="Not selected";
+  $("pickMetric").textContent="—";$("gamesMetric").textContent="0/15";
+  $("status").textContent="Select both champions to begin.";
+  $("simBtn").disabled=true;$("startBtn").disabled=false;$("b10Champ").disabled=false;$("secChamp").disabled=false;
+  document.querySelectorAll('input[name="draftMode"]').forEach(el=>el.disabled=false);
+  $("philosophySlider").disabled=false;
+  $("b10AutoChoice").textContent="Computer selects after you start";
+  $("secAutoChoice").textContent="Computer selects after you start";
+  updateModeHelp();
+  renderButtons();
+  renderDraftOrder();
+}
+
+document.querySelectorAll('input[name="draftMode"]').forEach(el=>{
+  el.addEventListener("change",()=>{
+    draftMode=document.querySelector('input[name="draftMode"]:checked').value;
+    updateModeHelp();
+    renderButtons();
+  });
+});
+updateModeHelp();
+$("startBtn").addEventListener("click",startDraft);
+$("simBtn").addEventListener("click",runSimulation);
+$("resetBtn").addEventListener("click",()=>resetState());
+renderButtons();
+</script>
+</body>
+</html>
