@@ -218,7 +218,7 @@ header:not(.cfb-site-header) h1,.hero h1{letter-spacing:-.025em}
 
   <section class="card">
     <div class="actions">
-      <a class="button secondary" href="big-ten-sec-draft-simulator-v17.html">Draft Again</a>
+      <a class="button secondary" href="draft.html">Draft Again</a>
     </div>
     <div id="status" class="status">Simulating all 16 games from the completed draft…</div>
     <div id="winner" class="winner" style="display:none"></div>
@@ -541,7 +541,15 @@ function simulate(){
     const atsScore=Math.max(25,Math.min(100,50+(atsPct-.5)*120));
     const score=0.55*recordScore+0.15*roadScore+0.15*upsetScore+0.15*atsScore;
 
-    return {conf,confName,score,wins,losses,roadWins,upsets,atsWins,atsPushes};
+    let letter;
+if(wins>=11) letter="A+";
+else if(wins==10) letter="A";
+else if(wins==9) letter="A-";
+else if(wins==8) letter=(standardBearerWinner===conf)?"B-":"C+";
+else if(wins==7) letter="C";
+else if(wins==6) letter="D";
+else letter="F";
+return {conf,confName,score,wins,losses,roadWins,upsets,atsWins,atsPushes,letter};
   }
 
   function commissionerDecisionReport(conf){
@@ -652,7 +660,7 @@ function simulate(){
         <section class="recap-section challenge-recap">
           <div class="recap-heading">
             <h2>Challenge Result</h2>
-            <div class="recap-grade">${letterGrade(challenge.score)}</div>
+            <div class="recap-grade">${challenge.letter}</div>
           </div>
           <p class="recap-subtitle">${challenge.confName} performance across the full 16-game Challenge.</p>
           <div class="recap-grid">
@@ -696,7 +704,7 @@ function simulate(){
       <div class="recap-grid">
         <div class="recap-box"><span>Average Margin</span><strong>${averageActualMargin.toFixed(1)} points</strong></div>
         <div class="recap-box"><span>One-Score Games</span><strong>${oneScoreGames}/16</strong></div>
-        <div class="recap-box"><span>Blue-Blood Matchups</span><strong>${blueBloodGames}</strong></div>
+        <div class="recap-box"><span>National Matchups</span><strong>${blueBloodGames}</strong></div>
         <div class="recap-box"><span>Average Projected Spread</span><strong>${averageProjectedSpread.toFixed(1)}</strong></div>
       </div>
     </section>
