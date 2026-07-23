@@ -717,6 +717,10 @@ function draftPickGrade(home,away,homeConf){
   if(p<=28 && tv<45) score-=18;                            // Purdue-Texas type disaster
   if(p<=20) score-=8;
   if(tv>=90 && oppStrength>=75 && p>=42) score+=7;         // marquee, competitive swing game
+  // Challenge calibration: the field already consists of purposeful Power Four
+  // matchups, so credible games receive a modest event-quality floor without
+  // rescuing obvious cherry-picks or hopeless mismatches.
+  score += 7;
   score=Math.max(0,Math.min(100,score));
 
   let letter, cls;
@@ -903,7 +907,7 @@ function runSimulation(){
     }))
   };
   const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-  window.location.href=`big-ten-sec-challenge-results-v17.html?draft=${encodeURIComponent(encoded)}`;
+  window.location.href=`results.html?draft=${encodeURIComponent(encoded)}`;
 }
 
 function resetState(clearChamp=true){
