@@ -648,6 +648,27 @@ function matchupDraftScore(home,away,homeConf){
 }
 
 
+
+const combinedTeamRanking=[...bigTen,...sec]
+  .slice()
+  .sort((a,b)=>b.r-a.r)
+  .reduce((map,team,index)=>{
+    map[team.name]=index+1;
+    return map;
+  },{});
+
+function matchupRankingFloor(home,away){
+  const homeRank=combinedTeamRanking[home.name] ?? 99;
+  const awayRank=combinedTeamRanking[away.name] ?? 99;
+  const worstRank=Math.max(homeRank,awayRank);
+
+  // A matchup made entirely from the top 15 is premium inventory.
+  // A matchup made entirely from the top 25 is still nationally relevant.
+  if(worstRank<=15) return 84; // A-
+  if(worstRank<=25) return 73; // B
+  return 0;
+}
+
 function draftPickGrade(home,away,homeConf){
   const tv=tvProduct(home,away);
   const p=homeWinProb(home,away)*100;
@@ -671,6 +692,10 @@ function draftPickGrade(home,away,homeConf){
   // Curated matchup floors prevent historically meaningful or natural-rivalry
   // games from being graded like generic pairings with similar ratings.
   if(story.minGrade) score=Math.max(score,story.minGrade);
+
+  // Ranking floors keep strong top-half matchups from being dragged down by
+  // one unfavorable spread or by opponent-pool math late in the draft.
+  score=Math.max(score,matchupRankingFloor(home,away));
 
   score=Math.max(0,Math.min(100,score));
 
