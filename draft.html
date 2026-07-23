@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Big Ten vs SEC Challenge Draft Simulator v17</title>
+<title>Big Ten vs SEC Challenge Draft Simulator</title>
 <style>
   :root{
     --bg:#f4f6f8; --panel:#ffffff; --ink:#15202b; --muted:#6b7280;
@@ -505,13 +505,14 @@ function teamClicked(conf,team){
 
 
 const brandScore = {
-  "Ohio State":100,"Michigan":98,"Alabama":98,"Georgia":97,"Texas":97,"Penn State":92,
-  "Oklahoma":91,"USC":91,"Oregon":90,"LSU":90,"Texas A&M":88,"Tennessee":87,
-  "Florida":86,"Auburn":84,"Nebraska":83,"Ole Miss":82,"Iowa":79,"Wisconsin":78,
-  "Indiana":88,"Washington":76,"South Carolina":75,"Michigan State":74,"Arkansas":72,
-  "Missouri":70,"Illinois":70,"Kentucky":68,"Minnesota":66,"Maryland":64,
-  "Vanderbilt":62,"Mississippi State":61,"UCLA":60,"Northwestern":55,"Rutgers":52,
-  "Purdue":40
+  // Brand scores are intentionally tiered rather than tied directly to team strength.
+  "Ohio State":100,"Michigan":100,"Alabama":100,"Texas":100,"Georgia":98,
+  "Oklahoma":97,"USC":97,"Oregon":95,
+  "Penn State":92,"LSU":92,"Florida":90,"Tennessee":90,"Texas A&M":90,"Ole Miss":87,
+  "Auburn":86,"Nebraska":85,"Wisconsin":83,"Iowa":82,"Indiana":82,"Washington":81,
+  "Illinois":78,"South Carolina":77,"Michigan State":76,"Missouri":76,
+  "Arkansas":73,"Kentucky":72,"Minnesota":69,"Maryland":67,"Vanderbilt":66,
+  "Mississippi State":65,"UCLA":64,"Northwestern":58,"Rutgers":54,"Purdue":42
 };
 
 const locationScore = {
@@ -525,21 +526,76 @@ const locationScore = {
   "Kentucky":78,"Vanderbilt":68
 };
 
+// Some games are more valuable than the sum of two isolated brand scores.
+// Keys are alphabetical so the bonus applies regardless of which team is home.
+const matchupStories = {
+  "Alabama|Michigan":       {history:15,national:10,minGrade:94,label:"blue-blood showcase"},
+  "Ohio State|Texas":       {history:15,national:10,minGrade:94,label:"blue-blood showcase"},
+  "Oklahoma|USC":           {history:12,national:9,minGrade:84,label:"historic national-brand matchup"},
+  "Indiana|Texas A&M":      {history:4,national:8,minGrade:84,label:"playoff-contender showcase"},
+  "Auburn|Penn State":      {history:8,national:6,minGrade:80,label:"major-brand stadium showcase"},
+  "Illinois|Missouri":      {history:14,national:4,minGrade:80,label:"Border War rivalry"},
+  "Indiana|Kentucky":       {history:14,national:4,minGrade:80,label:"regional rivalry"},
+  "Florida|Michigan":       {history:8,national:7,minGrade:82,label:"familiar postseason brands"},
+  "LSU|Michigan":           {history:7,national:8,minGrade:82,label:"national-brand first-class matchup"},
+  "Alabama|Ohio State":     {history:13,national:10,minGrade:94,label:"blue-blood showcase"},
+  "Georgia|Ohio State":     {history:11,national:10,minGrade:90,label:"playoff-caliber showcase"},
+  "Oregon|Texas":           {history:6,national:9,minGrade:88,label:"modern national-title showcase"},
+  "Georgia|Oregon":         {history:7,national:9,minGrade:88,label:"modern national-title showcase"},
+  "Penn State|Tennessee":   {history:6,national:6,minGrade:80,label:"major-brand showcase"},
+  "LSU|Penn State":         {history:6,national:7,minGrade:80,label:"major-brand showcase"},
+  "LSU|Wisconsin":          {history:3,national:4,minGrade:65,label:"recognizable cross-conference matchup"},
+  "Florida|Northwestern":   {history:0,national:2,minGrade:57,label:"solid national-brand inventory"}
+};
+
+function matchupKey(a,b){
+  return [a.name,b.name].sort().join("|");
+}
+
+function matchupStory(home,away){
+  return matchupStories[matchupKey(home,away)] || {history:0,national:0,minGrade:0,label:""};
+}
+
 function spreadTVScore(home,away){
   const margin=Math.abs((home.r+HFA)-away.r);
-  // Elite TV window: pick'em through one score. After seven points, blowouts
-  // are punished aggressively; a 30-point mismatch can carry a negative component.
   if(margin<=3) return 100;
-  if(margin<=7) return 100-(margin-3)*2.5;  // 90 at 7
-  return 90-(margin-7)*6.5;                 // ~-60 at 30
+  if(margin<=7) return 100-(margin-3)*2.5;
+  return 90-(margin-7)*6.5;
+}
+
+function nationalInterestScore(home,away){
+  const a=brandScore[home.name] ?? 50;
+  const b=brandScore[away.name] ?? 50;
+  const high=Math.max(a,b), low=Math.min(a,b);
+
+  // Two truly national brands create a larger product than a linear average.
+  let score=0.55*high+0.45*low;
+  if(low>=95) score+=8;
+  else if(low>=90) score+=5;
+  else if(low>=82 && high>=95) score+=3;
+
+  return Math.max(0,Math.min(100,score));
 }
 
 function tvProduct(home,away){
   const homeBrand=brandScore[home.name] ?? 50;
   const awayBrand=brandScore[away.name] ?? 50;
   const spread=spreadTVScore(home,away);
-  const location=locationScore[home.name] ?? 60;
-  const score=0.30*homeBrand+0.30*awayBrand+0.30*spread+0.10*location;
+  const story=matchupStory(home,away);
+  const national=nationalInterestScore(home,away);
+
+  // TV value now reflects brands, competitiveness, history/rivalry and
+  // national interest. The story values are additive bonuses within their
+  // respective 15% and 10% buckets.
+  const historyScore=Math.min(100,story.history*6.5);
+  const nationalScore=Math.min(100,national+story.national*2.5);
+  const score=
+    0.25*homeBrand+
+    0.25*awayBrand+
+    0.25*spread+
+    0.15*historyScore+
+    0.10*nationalScore;
+
   return Math.max(0,Math.min(100,score));
 }
 
@@ -598,28 +654,38 @@ function draftPickGrade(home,away,homeConf){
   const opponentConf=homeConf==="B10"?"SEC":"B10";
   const opponentPool=opponentConf==="SEC"?sec:bigTen;
   const oppStrength=opponentStrengthScore(away,opponentPool);
+  const story=matchupStory(home,away);
+  const combinedBrand=((brandScore[home.name]??50)+(brandScore[away.name]??50))/2;
 
-  // A great pick combines premium TV, a meaningful opponent, and a credible
-  // chance to win. Sure wins against weak teams are capped, while likely losses
-  // in poor television games are punished heavily.
-  let score=0.45*tv+0.30*oppStrength+0.25*p;
+  // A strong pick combines television value, opponent quality and a credible
+  // path to victory. Premium brands and genuine rivalries receive the value
+  // that a network would actually assign them.
+  let score=0.52*tv+0.27*oppStrength+0.21*p;
 
-  if(p>=78 && oppStrength<35) score=Math.min(score,76);     // OSU-Kentucky type ceiling
-  if(p<=28 && tv<45) score-=18;                            // Purdue-Texas type disaster
+  if(p>=78 && oppStrength<35 && !story.minGrade) score=Math.min(score,76);
+  if(p<=28 && tv<45) score-=18;
   if(p<=20) score-=8;
-  if(tv>=90 && oppStrength>=75 && p>=42) score+=7;         // marquee, competitive swing game
+  if(tv>=88 && oppStrength>=70 && p>=40) score+=6;
+  if(combinedBrand>=94 && p>=35) score+=5;
+
+  // Curated matchup floors prevent historically meaningful or natural-rivalry
+  // games from being graded like generic pairings with similar ratings.
+  if(story.minGrade) score=Math.max(score,story.minGrade);
+
   score=Math.max(0,Math.min(100,score));
 
   let letter, cls;
   if(score>=94){letter="A+";cls="grade-a";}
   else if(score>=88){letter="A";cls="grade-a";}
+  else if(score>=84){letter="A-";cls="grade-a";}
   else if(score>=80){letter="B+";cls="grade-b";}
   else if(score>=73){letter="B";cls="grade-b";}
   else if(score>=65){letter="C+";cls="grade-c";}
   else if(score>=57){letter="C";cls="grade-c";}
   else if(score>=48){letter="D";cls="grade-d";}
   else {letter="F";cls="grade-f";}
-  return {score,letter,cls,tv,p,oppStrength};
+
+  return {score,letter,cls,tv,p,oppStrength,story:story.label};
 }
 
 function conferenceDraftScore(conf){
@@ -794,7 +860,7 @@ function runSimulation(){
     }))
   };
   const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-  window.location.href=`big-ten-sec-challenge-results-v17.html?draft=${encodeURIComponent(encoded)}`;
+  window.location.href=`/cfbchallenge/results.html?draft=${encodeURIComponent(encoded)}`;
 }
 
 function resetState(clearChamp=true){
