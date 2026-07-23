@@ -3,214 +3,188 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Big Ten–SEC Challenge Results v17</title>
-
+<title>Big Ten–SEC Challenge Results | CFB Challenge</title>
 <style>
-:root{
-  --bg:#eef2f6;
-  --card:#ffffff;
-  --text:#18212b;
-  --muted:#667085;
-  --border:#d7dee7;
-  --blue:#1d4ed8;
-  --green:#15803d;
-  --lime:#65a30d;
-  --yellow:#eab308;
-  --orange:#ea580c;
-  --red:#b91c1c;
-  --purple:#7c3aed;
-  --teal:#0f766e;
-}
+:root{--bg:#f3f5f7;--card:#fff;--text:#17202a;--muted:#667085;--line:#d8dee6;--b10:#174ea6;--sec:#8b1e1e}
 *{box-sizing:border-box}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:Arial,Helvetica,sans-serif;
-}
-.container{
-  width:min(1180px,calc(100% - 28px));
-  margin:24px auto 48px;
-}
-.hero,.card{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:18px;
-  padding:24px;
-  margin-bottom:18px;
-}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+.container{max-width:1050px;margin:0 auto;padding:28px 18px 48px}
+.hero{background:#111827;color:#fff;border-radius:18px;padding:26px;margin-bottom:18px}
 .hero h1{margin:0 0 8px;font-size:32px}
-.hero p{margin:0;color:var(--muted)}
-.top-actions{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-  margin-bottom:18px;
+.hero p{margin:0;color:#d1d5db}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;margin-top:16px}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+button,a.button{border:0;border-radius:10px;padding:12px 16px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block}
+.primary{background:#111827;color:#fff}
+.secondary{background:#e5e7eb;color:#111827}
+.status{margin:14px 0;color:var(--muted);font-weight:700}
+.game{display:grid;grid-template-columns:1fr auto;gap:14px;padding:14px 0;border-bottom:1px solid #e5e7eb}
+.game:last-child{border-bottom:0}
+.game small{color:var(--muted)}
+.game-score{text-align:right;font-size:18px;font-weight:800;white-space:nowrap}
+.game-score small{display:block;font-size:12px;font-weight:600;margin-top:3px}
+.winner{font-size:34px;font-weight:900;text-align:center;margin-top:20px;padding:22px;border-radius:14px;background:#eef2ff}
+.standard{border-left:5px solid #d4a017;padding-left:12px}
+.breakdown-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.breakdown-item{background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:14px;text-align:center}
+.breakdown-item span{display:block;color:var(--muted);font-size:13px;margin-bottom:5px}
+.breakdown-item strong{font-size:24px;display:block}
+.breakdown-item small{display:block;color:var(--muted);margin-top:6px;line-height:1.35}
+@media(max-width:650px){.breakdown-grid{grid-template-columns:1fr}}
+@media(max-width:650px){
+.commissioner-report+.commissioner-report{margin-top:24px;padding-top:24px;border-top:2px solid var(--border)}
+.commissioner-title{text-align:center;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:900;margin:0 0 14px}
+.grade-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
+.grade-strip>div{border:1px solid var(--border);border-radius:14px;padding:17px 14px;text-align:center;background:#f8fafc}
+.grade-strip span{display:block;color:var(--muted);font-size:13px;margin-bottom:16px;line-height:1.35;min-height:18px}
+.grade-strip strong{display:block;font-size:36px;line-height:1;padding-top:2px}
+.report-placeholder{padding:22px;text-align:center;color:var(--muted);background:#f8fafc;border-radius:14px}
+.overall-verdict{border-radius:14px;background:#111827;color:#fff;padding:20px;text-align:center;font-size:18px;line-height:1.45}
+.overall-verdict b{display:block;font-size:26px;margin-bottom:7px}
+@media(max-width:650px){.grade-strip{grid-template-columns:1fr}}
+
+
+  .scorecard-stack{display:grid;gap:18px}
+  .score-category{border:1px solid var(--border);border-radius:16px;padding:20px;background:#fff}
+  .score-category h3{margin:0;font-size:20px}
+  .score-category .category-subtitle{display:block;color:var(--muted);font-size:13px;margin-top:4px}
+  .category-grade{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:18px 0 16px;padding:14px 16px;background:#f8fafc;border-radius:12px}
+  .category-grade span{display:block;font-weight:800;font-size:15px}
+  .category-grade strong{display:block;font-size:42px;line-height:1}
+  .category-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .category-metric{border-top:1px solid var(--border);padding-top:11px}
+  .category-metric span{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
+  .category-metric strong{display:block;font-size:17px}
+  .network-report{border-color:#7c3aed;background:#faf7ff}
+  .commissioner-category{border-color:#0f766e}
+  .challenge-category{border-color:#1d4ed8}
+  .commissioner-divider{height:1px;background:var(--border);margin:22px 0}
+  @media(max-width:760px){.category-metrics{grid-template-columns:1fr 1fr}}
+
+
+  .recap-section{margin-bottom:26px}
+  .recap-section:last-child{margin-bottom:0}
+  .recap-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:14px}
+  .recap-heading h2{margin:0;font-size:24px}
+  .recap-grade{min-width:74px;height:64px;padding:0 16px;border-radius:14px;display:grid;place-items:center;background:#111827;color:#fff;font-size:34px;font-weight:900;line-height:1}
+  .recap-subtitle{margin:-5px 0 16px;color:var(--muted);font-size:14px}
+  .recap-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .recap-box{border:1px solid var(--border);border-radius:14px;padding:16px;background:#f8fafc}
+  .recap-box span{display:block;color:var(--muted);font-size:12px;margin-bottom:9px}
+  .recap-box strong{display:block;font-size:21px;line-height:1.15}
+  .recap-box small{display:block;color:var(--muted);font-size:11px;margin-top:6px;line-height:1.3}
+  .challenge-recap{border-top:5px solid #1d4ed8;padding-top:18px}
+  .commissioner-recap{border-top:5px solid #0f766e;padding-top:18px}
+  .network-recap{border-top:5px solid #7c3aed;padding-top:18px}
+  .review-recap{margin-top:24px;border-radius:16px;background:#111827;color:#fff;padding:22px;text-align:center;font-size:17px;line-height:1.5}
+  .review-recap b{display:block;font-size:25px;margin-bottom:8px}
+  .scorecard-separator{height:1px;background:var(--border);margin:30px 0}
+  @media(max-width:760px){
+    .recap-grid{grid-template-columns:1fr 1fr}
+    .recap-heading{align-items:flex-start}
+  }
+
+</style>
+
+<style id="cfb-shared-theme">
+:root{
+  --navy:#0d1b2a; --navy2:#163d87; --blue:#1d4ed8; --red:#b91c1c;
+  --gold:#d6a84b; --ink:#17202a; --muted:#667085; --line:#d9e0e8;
+  --paper:#ffffff; --wash:#f3f6fa; --soft:#f8fafc; --soft-gold:#fff7df;
+  --bg:var(--wash); --panel:var(--paper); --text:var(--ink); --card:var(--paper);
+  --b10:var(--blue); --sec:var(--red); --accent:var(--navy2); --border:var(--line);
 }
-.button{
+body{background:var(--wash);color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+.cfb-site-header{background:var(--navy);color:#fff;border-bottom:4px solid var(--gold)}
+.cfb-nav{width:min(1180px,calc(100% - 32px));min-height:72px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.cfb-brand{color:#fff;text-decoration:none;font-size:20px;font-weight:900;letter-spacing:.03em}
+.cfb-brand span{color:var(--gold)}
+.cfb-nav-links{display:flex;align-items:center;gap:20px;font-size:14px;font-weight:800}
+.cfb-nav-links a{color:#fff;text-decoration:none}
+.cfb-nav-links .cfb-nav-cta{padding:10px 14px;border-radius:9px;background:#fff;color:var(--navy)}
+header:not(.cfb-site-header),.hero{background:linear-gradient(115deg,var(--navy),var(--navy2));color:#fff;border-bottom:0}
+header:not(.cfb-site-header){padding:28px 22px}
+header:not(.cfb-site-header) h1,.hero h1{letter-spacing:-.025em}
+.main,.sidebar,.card,.mode-panel,.philosophy-panel,.draft-order-card{border-color:var(--line);box-shadow:0 4px 18px rgba(16,24,40,.04)}
+.main,.sidebar,.card{border-radius:20px}
+.primary,.sim{background:var(--navy);color:#fff}
+.secondary{background:#eef2f7;color:var(--navy)}
+.standard-copy,.champion-card{background:var(--soft-gold);border-color:#efdca7}
+.status{background:#eef3f8}
+.mode-toggle input:checked+span{background:var(--navy);border-color:var(--navy)}
+.philosophy-panel input[type="range"]{accent-color:var(--navy2)}
+.winner{background:var(--soft-gold);border:1px solid #efdca7;color:var(--navy)}
+.commissioner-review,.overall-verdict{background:var(--navy)}
+.result-panel{background:#f2f7ff;border-color:#bfd0ee}
+@media(max-width:650px){.cfb-nav-links a:not(.cfb-nav-cta){display:none}}
+</style>
+
+
+<style id="cfb-cross-page-links">
+.cfb-page-links{
+  margin:24px 0 0;
+  padding:22px;
+  border:1px solid var(--line,#d9e0e8);
+  border-radius:16px;
+  background:var(--soft,#f8fafc);
+}
+.cfb-page-links h3{
+  margin:0 0 8px;
+  font-size:22px;
+  line-height:1.25;
+  letter-spacing:-.015em;
+}
+.cfb-page-links p{
+  margin:0 0 14px;
+  color:var(--muted,#667085);
+}
+.cfb-page-link-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+.cfb-page-link{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  padding:12px 18px;
-  border-radius:10px;
-  border:0;
-  background:#e4e8ee;
-  color:var(--text);
+  min-height:44px;
+  padding:10px 15px;
+  border-radius:9px;
+  background:var(--navy,#0d1b2a);
+  color:#fff!important;
   text-decoration:none;
-  font-weight:800;
-}
-#status{color:var(--muted);font-weight:700}
-#winner{
-  display:none;
-  padding:22px;
-  border-radius:14px;
-  background:#eef2ff;
-  text-align:center;
-  font-size:34px;
-  line-height:1.15;
   font-weight:900;
 }
-.results-scorecard{display:block}
-.results-section{
-  padding:25px 0;
-}
-.results-section:first-child{padding-top:0}
-.results-section + .results-section{
-  border-top:1px solid var(--border);
-}
-.results-heading{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:18px;
-  margin-bottom:14px;
-}
-.results-heading h2{
-  margin:0;
-  font-size:27px;
-  line-height:1.15;
-}
-.grade-badge{
-  flex:0 0 auto;
-  min-width:68px;
-  height:60px;
-  padding:0 16px;
-  border-radius:12px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#fff;
-  font-size:31px;
-  font-weight:900;
-  line-height:1;
-}
-.grade-a{background:var(--green)}
-.grade-b{background:var(--lime)}
-.grade-c{background:var(--yellow);color:#422006}
-.grade-d{background:var(--orange)}
-.grade-f{background:var(--red)}
-.results-subtitle{
-  margin:0 0 18px;
-  color:var(--muted);
-  font-size:14px;
-}
-.results-box-grid{
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:14px;
-}
-.results-box{
-  min-width:0;
-  min-height:112px;
-  padding:17px;
-  border:1px solid var(--border);
-  border-radius:14px;
-  background:#f8fafc;
-  box-shadow:0 1px 2px rgba(16,24,40,.04);
-}
-.results-box span{
-  display:block;
-  margin-bottom:10px;
-  color:var(--muted);
-  font-size:12px;
-  font-weight:800;
-  text-transform:uppercase;
-  letter-spacing:.04em;
-}
-.results-box strong{
-  display:block;
-  color:var(--text);
-  font-size:25px;
-  line-height:1.1;
-}
-.results-box small{
-  display:block;
-  margin-top:8px;
-  color:var(--muted);
-  font-size:11px;
-  line-height:1.35;
-}
-.challenge-section{border-top:5px solid var(--blue)}
-.commissioner-section{border-top:5px solid var(--teal)}
-.network-section{border-top:5px solid var(--purple)}
-.commissioner-review{
-  margin-top:18px;
-  padding:21px 23px;
-  border-radius:14px;
-  background:#18212b;
-  color:#fff;
-  font-size:16px;
-  line-height:1.5;
-}
-.commissioner-review strong{
-  display:block;
-  margin-bottom:6px;
-  font-size:23px;
-}
-.scorecard-separator{
-  height:1px;
-  background:var(--border);
-  margin:30px 0;
-}
-.game{
-  display:flex;
-  justify-content:space-between;
-  gap:20px;
-  padding:16px 0;
-  border-bottom:1px solid var(--border);
-}
-.game:last-child{border-bottom:0}
-.game small{color:var(--muted)}
-.game-score{text-align:right;font-weight:800}
-.game-score small{display:block;margin-top:5px;font-weight:500}
-.standard{background:#fff9e8;margin:0 -12px;padding:16px 12px;border-radius:10px}
-@media(max-width:820px){
-  .results-box-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-@media(max-width:560px){
-  .container{width:min(100% - 16px,1180px);margin-top:8px}
-  .hero,.card{padding:18px;border-radius:14px}
-  .results-heading{align-items:flex-start}
-  .results-heading h2{font-size:23px}
-  .grade-badge{min-width:60px;height:54px;font-size:27px}
-  .results-box-grid{grid-template-columns:1fr}
-  #winner{font-size:27px}
-  .game{display:block}
-  .game-score{text-align:left;margin-top:10px}
+.cfb-page-link.alt{
+  background:#fff;
+  color:var(--navy,#0d1b2a)!important;
+  border:1px solid var(--line,#d9e0e8);
 }
 </style>
+
 </head>
 <body>
+
+<header class="cfb-site-header">
+  <nav class="cfb-nav" aria-label="Primary navigation">
+    <a class="cfb-brand" href="/cfbchallenge/">CFB <span>CHALLENGE</span></a>
+    <div class="cfb-nav-links">
+      <a href="/cfbchallenge/draft-explainer.html">Behind the Draft</a>
+      <a class="cfb-nav-cta" href="/cfbchallenge/draft.html">Draft Again</a>
+      <a href="/cfbchallenge/results.html">Results</a>
+    </div>
+  </nav>
+</header>
+
 <main class="container">
   <section class="hero">
     <h1>Big Ten–SEC Challenge Simulation</h1>
-    <p>The draft created the matchups. This page exists solely to play the Challenge and determine the winner.</p>
+    <p>The Big Ten–SEC Challenge Draft created the matchups. Now Challenge Weekend determines the Challenge Champion.</p>
   </section>
 
   <section class="card">
     <div class="actions">
-      <a class="button secondary" href="/cfbchallenge/draft.html">Draft Again</a>
+      <a class="button secondary" href="big-ten-sec-draft-simulator-v17.html">Draft Again</a>
     </div>
     <div id="status" class="status">Simulating all 16 games from the completed draft…</div>
     <div id="winner" class="winner" style="display:none"></div>
@@ -226,6 +200,16 @@ body{
     <h2>Game Results</h2>
     <div id="games">Playing the Challenge…</div>
   </section>
+
+<div class="cfb-page-links">
+  <h3>Want to understand the strategy behind the result?</h3>
+  <p>Learn how the draft creates Challenge Weekend, why the Commissioners' Classic matters and how each matchup fits the CFB Challenge.</p>
+  <div class="cfb-page-link-row">
+    <a class="cfb-page-link" href="/cfbchallenge/draft-explainer.html">Behind the Draft</a>
+    <a class="cfb-page-link alt" href="/cfbchallenge/draft.html">Draft Again</a>
+  </div>
+</div>
+
 </main>
 
 <script>
@@ -466,7 +450,7 @@ function simulate(){
 
     rows.push(`<div class="game ${i===0?"standard":""}">
       <div>
-        <b>${i===0?"Standard Bearer Game":`Game ${i}`}: ${g.away.name} at ${g.home.name}</b><br>
+        <b>${i===0?"Commissioners' Classic Game":`Game ${i}`}: ${g.away.name} at ${g.home.name}</b><br>
         <small>${g.line}${g.grade && g.grade.letter && g.grade.letter!=="—"?` · Draft grade ${g.grade.letter}`:""}</small>
       </div>
       <div class="game-score">
@@ -486,7 +470,7 @@ function simulate(){
     winnerText=`SEC WINS THE CHALLENGE, ${secWins}–${b10Wins}`;
   }else{
     const champ=standardBearerWinner==="B10"?"BIG TEN":"SEC";
-    winnerText=`CHALLENGE TIED 8–8 — ${champ} WINS THE STANDARD BEARER TIEBREAKER`;
+    winnerText=`CHALLENGE TIED 8–8 — ${champ} WINS ON THE SEC/B1G COMMISSIONERS' CLASSIC TIEBREAKER`;
   }
 
   const averageMargin=Math.abs(b10Points-secPoints)/card.length;
@@ -515,25 +499,14 @@ function simulate(){
     const upsets=gameOutcomes.filter(o=>o.winnerConf===conf&&o.upset).length;
     const atsWins=gameOutcomes.filter(o=>o.coverConf===conf).length;
     const atsPushes=gameOutcomes.filter(o=>o.isPush).length;
-    const atsLosses=16-atsWins-atsPushes;
 
-    const base =
-      wins>=12 ? 98 :
-      wins===11 ? 94 :
-      wins===10 ? 89 :
-      wins===9  ? 83 :
-      wins===8  ? 74 :
-      wins===7  ? 63 :
-      wins===6  ? 53 :
-      wins===5  ? 42 :
-      wins===4  ? 32 : 24;
+    const recordScore=Math.max(20,Math.min(100,50+(wins-8)*12));
+    const roadScore=Math.min(100,roadWins*25);
+    const upsetScore=Math.min(100,upsets*28);
+    const atsPct=atsWins/Math.max(1,16-atsPushes);
+    const atsScore=Math.max(25,Math.min(100,50+(atsPct-.5)*120));
+    const score=0.55*recordScore+0.15*roadScore+0.15*upsetScore+0.15*atsScore;
 
-    const roadBonus=Math.min(5,roadWins*1.5);
-    const upsetBonus=Math.min(6,upsets*2);
-    const atsPct=atsWins/Math.max(1,atsWins+atsLosses);
-    const atsAdjustment=Math.max(-4,Math.min(4,(atsPct-.5)*18));
-
-    const score=Math.max(20,Math.min(100,base+roadBonus+upsetBonus+atsAdjustment));
     return {conf,confName,score,wins,losses,roadWins,upsets,atsWins,atsPushes};
   }
 
@@ -595,17 +568,7 @@ function simulate(){
   resultsTVScore=Math.max(0,Math.min(100,resultsTVScore));
   const tvNetworkScore=0.75*draftTVScore+0.25*resultsTVScore;
 
-  
-  function gradeBadgeClass(score){
-    const grade=letterGrade(score);
-    if(grade.startsWith("A")) return "grade-a";
-    if(grade.startsWith("B")) return "grade-b";
-    if(grade.startsWith("C")) return "grade-c";
-    if(grade.startsWith("D")) return "grade-d";
-    return "grade-f";
-  }
-
-const reportConfs=draft.draftMode==="BOTH"
+  const reportConfs=draft.draftMode==="BOTH"
     ? ["B10","SEC"]
     : [draft.draftMode==="SEC"?"SEC":"B10"];
 
@@ -650,98 +613,57 @@ const reportConfs=draft.draftMode==="BOTH"
     const challenge=challengeResultReport(conf);
     const commissioner=commissionerDecisionReport(conf);
     const verdict=commissionerVerdict(challenge,commissioner);
-    const atsLosses=16-challenge.atsWins-challenge.atsPushes;
-
     return `
-      <div class="results-scorecard">
-        <section class="results-section challenge-section">
-          <div class="results-heading">
+      <div class="conference-scorecard">
+        <section class="recap-section challenge-recap">
+          <div class="recap-heading">
             <h2>Challenge Result</h2>
-            <div class="grade-badge ${gradeBadgeClass(challenge.score)}">${letterGrade(challenge.score)}</div>
+            <div class="recap-grade">${letterGrade(challenge.score)}</div>
           </div>
-          <p class="results-subtitle">${challenge.confName} performance across the full 16-game Challenge.</p>
-          <div class="results-box-grid">
-            <div class="results-box">
-              <span>Record</span>
-              <strong>${challenge.wins}–${challenge.losses}</strong>
-            </div>
-            <div class="results-box">
-              <span>Road Wins</span>
-              <strong>${challenge.roadWins}</strong>
-            </div>
-            <div class="results-box">
-              <span>Upsets</span>
-              <strong>${challenge.upsets}</strong>
-            </div>
-            <div class="results-box">
-              <span>ATS Record</span>
-              <strong>${challenge.atsWins}–${atsLosses}${challenge.atsPushes?`–${challenge.atsPushes}`:""}</strong>
-            </div>
+          <p class="recap-subtitle">${challenge.confName} performance across the full 16-game Challenge.</p>
+          <div class="recap-grid">
+            <div class="recap-box"><span>Record</span><strong>${challenge.wins}–${challenge.losses}</strong></div>
+            <div class="recap-box"><span>Road Wins</span><strong>${challenge.roadWins}</strong></div>
+            <div class="recap-box"><span>Upsets</span><strong>${challenge.upsets}</strong></div>
+            <div class="recap-box"><span>ATS Record</span><strong>${challenge.atsWins}–${16-challenge.atsWins-challenge.atsPushes}${challenge.atsPushes?`–${challenge.atsPushes}`:""}</strong></div>
           </div>
         </section>
 
-        <section class="results-section commissioner-section">
-          <div class="results-heading">
+        <section class="recap-section commissioner-recap">
+          <div class="recap-heading">
             <h2>${challenge.confName} Commissioner Grade</h2>
-            <div class="grade-badge ${gradeBadgeClass(commissioner.score)}">${letterGrade(commissioner.score)}</div>
+            <div class="recap-grade">${letterGrade(commissioner.score)}</div>
           </div>
-          <p class="results-subtitle">How effectively the commissioner used the matchups they controlled.</p>
-          <div class="results-box-grid">
-            <div class="results-box">
-              <span>Top-Six Teams Record</span>
-              <strong>${commissioner.contenderWins}–${commissioner.contenderLosses}</strong>
-              <small>Results for the conference’s playoff contenders.</small>
-            </div>
-            <div class="results-box">
-              <span>Home Teams Favored</span>
-              <strong>${commissioner.favoriteHomeGames}/${commissioner.totalHomeGames}</strong>
-              <small>Commissioner-controlled home teams projected to win.</small>
-            </div>
-            <div class="results-box">
-              <span>Average Home Edge</span>
-              <strong>${commissioner.avgHomeEdge>=0?"+":""}${commissioner.avgHomeEdge.toFixed(1)}</strong>
-              <small>Average projected margin in commissioner-controlled home games.</small>
-            </div>
-            <div class="results-box">
-              <span>7+ Point Underdogs</span>
-              <strong>${commissioner.sevenPointDogGames}</strong>
-              <small>Home teams placed in seriously unfavorable matchups.</small>
-            </div>
-          </div>
-          <div class="commissioner-review">
-            <strong>${verdict.title}</strong>
-            ${verdict.copy}
+          <p class="recap-subtitle">How effectively the commissioner used the matchups they controlled.</p>
+          <div class="recap-grid">
+            <div class="recap-box"><span>Top-Six Teams Record</span><strong>${commissioner.contenderWins}–${commissioner.contenderLosses}</strong><small>Results for the conference’s six highest-rated teams.</small></div>
+            <div class="recap-box"><span>Home Teams Favored</span><strong>${commissioner.favoriteHomeGames}/${commissioner.totalHomeGames}</strong><small>Drafted home teams projected to win.</small></div>
+            <div class="recap-box"><span>Average Home Edge</span><strong>${commissioner.avgHomeEdge>=0?"+":""}${commissioner.avgHomeEdge.toFixed(1)}</strong><small>Average projected margin for commissioner-controlled home games.</small></div>
+            <div class="recap-box"><span>7+ Point Underdog Picks</span><strong>${commissioner.sevenPointDogGames}</strong><small>Home teams placed in seriously unfavorable matchups.</small></div>
           </div>
         </section>
+
+        <div class="review-recap">
+          <b>${verdict.title}</b>
+          ${verdict.copy}
+        </div>
       </div>`;
   }).join('<div class="scorecard-separator"></div>');
 
   document.getElementById("commissionerReports").innerHTML=`
     ${conferenceRecaps}
     <div class="scorecard-separator"></div>
-    <section class="results-section network-section">
-      <div class="results-heading">
+    <section class="recap-section network-recap">
+      <div class="recap-heading">
         <h2>TV Network Report</h2>
-        <div class="grade-badge ${gradeBadgeClass(tvNetworkScore)}">${letterGrade(tvNetworkScore)}</div>
+        <div class="recap-grade">${letterGrade(tvNetworkScore)}</div>
       </div>
-      <p class="results-subtitle">The television quality of the entire 16-game Challenge.</p>
-      <div class="results-box-grid">
-        <div class="results-box">
-          <span>Average Margin</span>
-          <strong>${averageActualMargin.toFixed(1)} points</strong>
-        </div>
-        <div class="results-box">
-          <span>One-Score Games</span>
-          <strong>${oneScoreGames}/16</strong>
-        </div>
-        <div class="results-box">
-          <span>Blue-Blood Matchups</span>
-          <strong>${blueBloodGames}</strong>
-        </div>
-        <div class="results-box">
-          <span>Average Projected Spread</span>
-          <strong>${averageProjectedSpread.toFixed(1)}</strong>
-        </div>
+      <p class="recap-subtitle">The television quality of the entire 16-game Challenge.</p>
+      <div class="recap-grid">
+        <div class="recap-box"><span>Average Margin</span><strong>${averageActualMargin.toFixed(1)} points</strong></div>
+        <div class="recap-box"><span>One-Score Games</span><strong>${oneScoreGames}/16</strong></div>
+        <div class="recap-box"><span>Blue-Blood Matchups</span><strong>${blueBloodGames}</strong></div>
+        <div class="recap-box"><span>Average Projected Spread</span><strong>${averageProjectedSpread.toFixed(1)}</strong></div>
       </div>
     </section>
   `;

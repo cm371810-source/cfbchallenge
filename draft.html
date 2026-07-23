@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Big Ten vs SEC Challenge Draft Simulator</title>
+<title>Big Ten–SEC Challenge Draft Simulator | CFB Challenge</title>
 <style>
   :root{
     --bg:#f4f6f8; --panel:#ffffff; --ink:#15202b; --muted:#6b7280;
@@ -126,21 +126,111 @@
   .draft-order-list li.current-order .current-copy small{display:block;color:var(--muted);font-weight:500;margin-top:2px}
 
 </style>
+
+<style id="cfb-shared-theme">
+:root{
+  --navy:#0d1b2a; --navy2:#163d87; --blue:#1d4ed8; --red:#b91c1c;
+  --gold:#d6a84b; --ink:#17202a; --muted:#667085; --line:#d9e0e8;
+  --paper:#ffffff; --wash:#f3f6fa; --soft:#f8fafc; --soft-gold:#fff7df;
+  --bg:var(--wash); --panel:var(--paper); --text:var(--ink); --card:var(--paper);
+  --b10:var(--blue); --sec:var(--red); --accent:var(--navy2); --border:var(--line);
+}
+body{background:var(--wash);color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+.cfb-site-header{background:var(--navy);color:#fff;border-bottom:4px solid var(--gold)}
+.cfb-nav{width:min(1180px,calc(100% - 32px));min-height:72px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.cfb-brand{color:#fff;text-decoration:none;font-size:20px;font-weight:900;letter-spacing:.03em}
+.cfb-brand span{color:var(--gold)}
+.cfb-nav-links{display:flex;align-items:center;gap:20px;font-size:14px;font-weight:800}
+.cfb-nav-links a{color:#fff;text-decoration:none}
+.cfb-nav-links .cfb-nav-cta{padding:10px 14px;border-radius:9px;background:#fff;color:var(--navy)}
+header:not(.cfb-site-header),.hero{background:linear-gradient(115deg,var(--navy),var(--navy2));color:#fff;border-bottom:0}
+header:not(.cfb-site-header){padding:28px 22px}
+header:not(.cfb-site-header) h1,.hero h1{letter-spacing:-.025em}
+.main,.sidebar,.card,.mode-panel,.philosophy-panel,.draft-order-card{border-color:var(--line);box-shadow:0 4px 18px rgba(16,24,40,.04)}
+.main,.sidebar,.card{border-radius:20px}
+.primary,.sim{background:var(--navy);color:#fff}
+.secondary{background:#eef2f7;color:var(--navy)}
+.standard-copy,.champion-card{background:var(--soft-gold);border-color:#efdca7}
+.status{background:#eef3f8}
+.mode-toggle input:checked+span{background:var(--navy);border-color:var(--navy)}
+.philosophy-panel input[type="range"]{accent-color:var(--navy2)}
+.winner{background:var(--soft-gold);border:1px solid #efdca7;color:var(--navy)}
+.commissioner-review,.overall-verdict{background:var(--navy)}
+.result-panel{background:#f2f7ff;border-color:#bfd0ee}
+@media(max-width:650px){.cfb-nav-links a:not(.cfb-nav-cta){display:none}}
+</style>
+
+
+<style id="cfb-cross-page-links">
+.cfb-page-links{
+  margin:24px 0 0;
+  padding:22px;
+  border:1px solid var(--line,#d9e0e8);
+  border-radius:16px;
+  background:var(--soft,#f8fafc);
+}
+.cfb-page-links h3{
+  margin:0 0 8px;
+  font-size:22px;
+  line-height:1.25;
+  letter-spacing:-.015em;
+}
+.cfb-page-links p{
+  margin:0 0 14px;
+  color:var(--muted,#667085);
+}
+.cfb-page-link-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+.cfb-page-link{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:44px;
+  padding:10px 15px;
+  border-radius:9px;
+  background:var(--navy,#0d1b2a);
+  color:#fff!important;
+  text-decoration:none;
+  font-weight:900;
+}
+.cfb-page-link.alt{
+  background:#fff;
+  color:var(--navy,#0d1b2a)!important;
+  border:1px solid var(--line,#d9e0e8);
+}
+</style>
+
 </head>
 <body>
+
+<header class="cfb-site-header">
+  <nav class="cfb-nav" aria-label="Primary navigation">
+    <a class="cfb-brand" href="/cfbchallenge/">CFB <span>CHALLENGE</span></a>
+    <div class="cfb-nav-links">
+      <a href="/cfbchallenge/draft-explainer.html">Behind the Draft</a>
+      <a class="cfb-nav-cta" href="/cfbchallenge/draft.html">Draft Simulator</a>
+      <a href="/cfbchallenge/results.html">Results</a>
+    </div>
+  </nav>
+</header>
+
 <header>
-  <h1>Big Ten vs SEC Challenge Draft Simulator</h1>
-  <p>Choose champions, draft home matchups, then run the Challenge. Choose which commissioner seat to control, build the matchups, then run the Challenge.</p>
+  <h1>Big Ten–SEC Challenge Draft Simulator</h1>
+  <p>Choose a commissioner seat, name the Standard Bearers, build the Big Ten–SEC Challenge, then play Challenge Weekend.</p>
 </header>
 
 <div class="shell">
   <main class="main">
     <section class="standard-copy">
-      <h2>Standard Bearer Game</h2>
+      <h2>SEC/B1G Commissioners' Classic</h2>
       <p>
         Before the draft begins, each conference names one Standard Bearer for the
-        tiebreaking final game. If the Challenge finishes 8–8, the winner of this
-        matchup wins the Challenge.
+        SEC/B1G Commissioners' Classic—the showcase finale of Challenge Weekend.
+        If the Challenge finishes 8–8, the winner of this matchup is awarded the
+        Challenge Championship as the official tiebreaker.
       </p>
     </section>
 
@@ -213,11 +303,21 @@
         <div id="secGrid" class="team-grid"></div>
       </div>
     </section>
-  </main>
+  
+<div class="cfb-page-links">
+  <h3>Why does the draft work this way?</h3>
+  <p>See how the Big Ten–SEC Challenge Draft, Challenge Weekend and the SEC/B1G Commissioners' Classic fit into the larger CFB Challenge.</p>
+  <div class="cfb-page-link-row">
+    <a class="cfb-page-link" href="/cfbchallenge/draft-explainer.html">Behind the Draft</a>
+    <a class="cfb-page-link alt" href="/cfbchallenge/results.html">View Results Page</a>
+  </div>
+</div>
+
+</main>
 
   <aside class="sidebar">
     <div class="champion-card">
-      <b>Standard Bearer Game</b>
+      <b>SEC/B1G Commissioners' Classic</b>
       <div id="championGame">Not selected</div>
       <small>The Big Ten Standard Bearer hosts in this version, giving each conference eight home games across 16 total games.</small>
     </div>
@@ -401,7 +501,7 @@ function renderGrid(conf,teams,grid,used){
     b.className=`team-btn ${conf==="B10"?"b10":"sec"}`;
     const isChamp = champion && ((conf==="B10"&&champion.b10.name===t.name)||(conf==="SEC"&&champion.sec.name===t.name));
     const isUsed=used.has(t.name);
-    if(isChamp){b.disabled=true;b.classList.add("champion");b.title="Standard Bearer Game";}
+    if(isChamp){b.disabled=true;b.classList.add("champion");b.title="SEC/B1G Commissioners' Classic";}
     else if(isUsed){b.disabled=true;b.classList.add("used");}
     if(selectedHome && selectedHome.conf===conf && selectedHome.team.name===t.name) b.classList.add("selected");
     const currentConf=started && pickIndex<order.length ? order[pickIndex] : null;
@@ -416,15 +516,24 @@ function renderGrid(conf,teams,grid,used){
 
 function chooseComputerStandardBearer(conf,opponent){
   const pool=conf==="B10"?bigTen:sec;
-  return [...pool].sort((x,y)=>{
-    const xHome=conf==="B10"?x:opponent;
-    const xAway=conf==="B10"?opponent:x;
-    const yHome=conf==="B10"?y:opponent;
-    const yAway=conf==="B10"?opponent:y;
-    const xScore=0.75*tvProduct(xHome,xAway)+0.25*(brandScore[x.name]??50);
-    const yScore=0.75*tvProduct(yHome,yAway)+0.25*(brandScore[y.name]??50);
-    return yScore-xScore;
-  })[0];
+  const ranked=[...pool].map(team=>{
+    const home=conf==="B10"?team:opponent;
+    const away=conf==="B10"?opponent:team;
+    const score=0.75*tvProduct(home,away)+0.25*(brandScore[team.name]??50);
+    return {team,score};
+  }).sort((a,b)=>b.score-a.score);
+
+  // The commissioner usually chooses the strongest showcase, but the top
+  // three options remain plausible so the Classic does not repeat forever.
+  // Top option: 70%; second option: 15%; third option: 15%.
+  const finalists=ranked.slice(0,Math.min(3,ranked.length));
+  if(finalists.length===1) return finalists[0].team;
+  if(finalists.length===2) return (Math.random()<0.80?finalists[0]:finalists[1]).team;
+
+  const draw=Math.random();
+  if(draw<0.70) return finalists[0].team;
+  if(draw<0.85) return finalists[1].team;
+  return finalists[2].team;
 }
 
 function startDraft(){
@@ -505,14 +614,13 @@ function teamClicked(conf,team){
 
 
 const brandScore = {
-  // Brand scores are intentionally tiered rather than tied directly to team strength.
-  "Ohio State":100,"Michigan":100,"Alabama":100,"Texas":100,"Georgia":98,
-  "Oklahoma":97,"USC":97,"Oregon":95,
-  "Penn State":92,"LSU":92,"Florida":90,"Tennessee":90,"Texas A&M":90,"Ole Miss":87,
-  "Auburn":86,"Nebraska":85,"Wisconsin":83,"Iowa":82,"Indiana":82,"Washington":81,
-  "Illinois":78,"South Carolina":77,"Michigan State":76,"Missouri":76,
-  "Arkansas":73,"Kentucky":72,"Minnesota":69,"Maryland":67,"Vanderbilt":66,
-  "Mississippi State":65,"UCLA":64,"Northwestern":58,"Rutgers":54,"Purdue":42
+  "Ohio State":100,"Michigan":98,"Alabama":98,"Georgia":97,"Texas":97,"Penn State":92,
+  "Oklahoma":91,"USC":91,"Oregon":90,"LSU":90,"Texas A&M":88,"Tennessee":87,
+  "Florida":86,"Auburn":84,"Nebraska":83,"Ole Miss":82,"Iowa":79,"Wisconsin":78,
+  "Indiana":88,"Washington":76,"South Carolina":75,"Michigan State":74,"Arkansas":72,
+  "Missouri":70,"Illinois":70,"Kentucky":68,"Minnesota":66,"Maryland":64,
+  "Vanderbilt":62,"Mississippi State":61,"UCLA":60,"Northwestern":55,"Rutgers":52,
+  "Purdue":40
 };
 
 const locationScore = {
@@ -526,76 +634,21 @@ const locationScore = {
   "Kentucky":78,"Vanderbilt":68
 };
 
-// Some games are more valuable than the sum of two isolated brand scores.
-// Keys are alphabetical so the bonus applies regardless of which team is home.
-const matchupStories = {
-  "Alabama|Michigan":       {history:15,national:10,minGrade:94,label:"blue-blood showcase"},
-  "Ohio State|Texas":       {history:15,national:10,minGrade:94,label:"blue-blood showcase"},
-  "Oklahoma|USC":           {history:12,national:9,minGrade:84,label:"historic national-brand matchup"},
-  "Indiana|Texas A&M":      {history:4,national:8,minGrade:84,label:"playoff-contender showcase"},
-  "Auburn|Penn State":      {history:8,national:6,minGrade:80,label:"major-brand stadium showcase"},
-  "Illinois|Missouri":      {history:14,national:4,minGrade:80,label:"Border War rivalry"},
-  "Indiana|Kentucky":       {history:14,national:4,minGrade:80,label:"regional rivalry"},
-  "Florida|Michigan":       {history:8,national:7,minGrade:82,label:"familiar postseason brands"},
-  "LSU|Michigan":           {history:7,national:8,minGrade:82,label:"national-brand first-class matchup"},
-  "Alabama|Ohio State":     {history:13,national:10,minGrade:94,label:"blue-blood showcase"},
-  "Georgia|Ohio State":     {history:11,national:10,minGrade:90,label:"playoff-caliber showcase"},
-  "Oregon|Texas":           {history:6,national:9,minGrade:88,label:"modern national-title showcase"},
-  "Georgia|Oregon":         {history:7,national:9,minGrade:88,label:"modern national-title showcase"},
-  "Penn State|Tennessee":   {history:6,national:6,minGrade:80,label:"major-brand showcase"},
-  "LSU|Penn State":         {history:6,national:7,minGrade:80,label:"major-brand showcase"},
-  "LSU|Wisconsin":          {history:3,national:4,minGrade:65,label:"recognizable cross-conference matchup"},
-  "Florida|Northwestern":   {history:0,national:2,minGrade:57,label:"solid national-brand inventory"}
-};
-
-function matchupKey(a,b){
-  return [a.name,b.name].sort().join("|");
-}
-
-function matchupStory(home,away){
-  return matchupStories[matchupKey(home,away)] || {history:0,national:0,minGrade:0,label:""};
-}
-
 function spreadTVScore(home,away){
   const margin=Math.abs((home.r+HFA)-away.r);
+  // Elite TV window: pick'em through one score. After seven points, blowouts
+  // are punished aggressively; a 30-point mismatch can carry a negative component.
   if(margin<=3) return 100;
-  if(margin<=7) return 100-(margin-3)*2.5;
-  return 90-(margin-7)*6.5;
-}
-
-function nationalInterestScore(home,away){
-  const a=brandScore[home.name] ?? 50;
-  const b=brandScore[away.name] ?? 50;
-  const high=Math.max(a,b), low=Math.min(a,b);
-
-  // Two truly national brands create a larger product than a linear average.
-  let score=0.55*high+0.45*low;
-  if(low>=95) score+=8;
-  else if(low>=90) score+=5;
-  else if(low>=82 && high>=95) score+=3;
-
-  return Math.max(0,Math.min(100,score));
+  if(margin<=7) return 100-(margin-3)*2.5;  // 90 at 7
+  return 90-(margin-7)*6.5;                 // ~-60 at 30
 }
 
 function tvProduct(home,away){
   const homeBrand=brandScore[home.name] ?? 50;
   const awayBrand=brandScore[away.name] ?? 50;
   const spread=spreadTVScore(home,away);
-  const story=matchupStory(home,away);
-  const national=nationalInterestScore(home,away);
-
-  // TV value now reflects brands, competitiveness, history/rivalry and
-  // national interest. The story values are additive bonuses within their
-  // respective 15% and 10% buckets.
-  const historyScore=Math.min(100,story.history*6.5);
-  const nationalScore=Math.min(100,national+story.national*2.5);
-  const score=
-    0.25*homeBrand+
-    0.25*awayBrand+
-    0.25*spread+
-    0.15*historyScore+
-    0.10*nationalScore;
-
+  const location=locationScore[home.name] ?? 60;
+  const score=0.30*homeBrand+0.30*awayBrand+0.30*spread+0.10*location;
   return Math.max(0,Math.min(100,score));
 }
 
@@ -648,69 +701,34 @@ function matchupDraftScore(home,away,homeConf){
 }
 
 
-
-const combinedTeamRanking=[...bigTen,...sec]
-  .slice()
-  .sort((a,b)=>b.r-a.r)
-  .reduce((map,team,index)=>{
-    map[team.name]=index+1;
-    return map;
-  },{});
-
-function matchupRankingFloor(home,away){
-  const homeRank=combinedTeamRanking[home.name] ?? 99;
-  const awayRank=combinedTeamRanking[away.name] ?? 99;
-  const worstRank=Math.max(homeRank,awayRank);
-
-  // A matchup made entirely from the top 15 is premium inventory.
-  // A matchup made entirely from the top 25 is still nationally relevant.
-  if(worstRank<=15) return 84; // A-
-  if(worstRank<=25) return 73; // B
-  return 0;
-}
-
 function draftPickGrade(home,away,homeConf){
   const tv=tvProduct(home,away);
   const p=homeWinProb(home,away)*100;
   const opponentConf=homeConf==="B10"?"SEC":"B10";
   const opponentPool=opponentConf==="SEC"?sec:bigTen;
   const oppStrength=opponentStrengthScore(away,opponentPool);
-  const story=matchupStory(home,away);
-  const combinedBrand=((brandScore[home.name]??50)+(brandScore[away.name]??50))/2;
 
-  // A strong pick combines television value, opponent quality and a credible
-  // path to victory. Premium brands and genuine rivalries receive the value
-  // that a network would actually assign them.
-  let score=0.52*tv+0.27*oppStrength+0.21*p;
+  // A great pick combines premium TV, a meaningful opponent, and a credible
+  // chance to win. Sure wins against weak teams are capped, while likely losses
+  // in poor television games are punished heavily.
+  let score=0.45*tv+0.30*oppStrength+0.25*p;
 
-  if(p>=78 && oppStrength<35 && !story.minGrade) score=Math.min(score,76);
-  if(p<=28 && tv<45) score-=18;
+  if(p>=78 && oppStrength<35) score=Math.min(score,76);     // OSU-Kentucky type ceiling
+  if(p<=28 && tv<45) score-=18;                            // Purdue-Texas type disaster
   if(p<=20) score-=8;
-  if(tv>=88 && oppStrength>=70 && p>=40) score+=6;
-  if(combinedBrand>=94 && p>=35) score+=5;
-
-  // Curated matchup floors prevent historically meaningful or natural-rivalry
-  // games from being graded like generic pairings with similar ratings.
-  if(story.minGrade) score=Math.max(score,story.minGrade);
-
-  // Ranking floors keep strong top-half matchups from being dragged down by
-  // one unfavorable spread or by opponent-pool math late in the draft.
-  score=Math.max(score,matchupRankingFloor(home,away));
-
+  if(tv>=90 && oppStrength>=75 && p>=42) score+=7;         // marquee, competitive swing game
   score=Math.max(0,Math.min(100,score));
 
   let letter, cls;
   if(score>=94){letter="A+";cls="grade-a";}
   else if(score>=88){letter="A";cls="grade-a";}
-  else if(score>=84){letter="A-";cls="grade-a";}
   else if(score>=80){letter="B+";cls="grade-b";}
   else if(score>=73){letter="B";cls="grade-b";}
   else if(score>=65){letter="C+";cls="grade-c";}
   else if(score>=57){letter="C";cls="grade-c";}
   else if(score>=48){letter="D";cls="grade-d";}
   else {letter="F";cls="grade-f";}
-
-  return {score,letter,cls,tv,p,oppStrength,story:story.label};
+  return {score,letter,cls,tv,p,oppStrength};
 }
 
 function conferenceDraftScore(conf){
@@ -885,7 +903,7 @@ function runSimulation(){
     }))
   };
   const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-  window.location.href=`/cfbchallenge/results.html?draft=${encodeURIComponent(encoded)}`;
+  window.location.href=`big-ten-sec-challenge-results-v17.html?draft=${encodeURIComponent(encoded)}`;
 }
 
 function resetState(clearChamp=true){
